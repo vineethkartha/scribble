@@ -1,0 +1,12 @@
+#include<iostream>
+#include "include/GapBuffer.hpp"
+
+int main() {
+  GapBuffer gp(20) ;
+  gp.addChar('a');
+  gp.addChar('b');
+  gp.addChar('c');
+  gp.addChar('d');
+  gp.printBuffer();
+  return 0;
+}
