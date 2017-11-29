@@ -27,9 +27,11 @@ class GapBuffer {
   char *bufferEnd;
   char *gapStart;
   char *gapEnd;
+  char *cursorPos;
   char *buffer;
 public:
   GapBuffer(int gapSize);
+  //GapBuffer(FILE *fileH);
   //GapBuffer(FILE *file, int gapSize);
   ~GapBuffer();
   char* addChar(char c);

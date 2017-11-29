@@ -6,40 +6,40 @@ GapBuffer::GapBuffer(int gapSize) {
   this->gapSize = gapSize;
   this->buffer = new char[this->gapSize];
   this->bufferStart = this->buffer;
+  this->cursorPos = this->bufferStart;
   this->gapStart = this->buffer;
   this->gapEnd = this->gapStart + this->gapSize;
   this->bufferEnd = this->bufferStart + this->gapSize;
 }
+
+/* implement the cons with a file input
+GapBuffer::GapBuffer(FILE *fileH) {
+}*/
 
 GapBuffer::~GapBuffer() {
   delete(this->buffer);
 }
 
 char* GapBuffer::addChar(char c) {
-  *(this->gapStart) = c;
-  this->gapStart++;
+  *(this->cursorPos) = c;
+  this->cursorPos++;
   this->insertCounter += 1;
-  return this->gapStart;
+  return this->cursorPos;
 }
 
-
-/*void GapBuffer::MoveGap(char *pointer) {
-  // assuming that the pointer is moved backwards
-  int sizetoMove = this->gapStart - pointer;
-  auto newPointer = this->bufferEnd -sizetoMove;
-  std::copy(pointer, pointer + sizetoMove, newPointer);
-  this->gapStart = pointer;
-  this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
-  }*/
 
 void GapBuffer::MoveGap(int pos) {
   auto pointer = this->bufferStart + pos;
   // assuming that the pointer is moved backwards
-  int sizetoMove = this->gapStart - pointer;
+  int sizetoMove = this->cursorPos - pointer;
   auto newPointer = this->bufferEnd -sizetoMove;
-  std::copy(pointer, pointer + sizetoMove, newPointer);
+  std::copy(pointer, pointer + (sizetoMove), newPointer);
   this->gapStart = pointer;
   this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
+  // Clear the gap
+  for(auto p = this->gapStart; p < this->gapEnd; ++p)
+    *p ='\0';
+  this->cursorPos = this->gapStart;
   }
 
 void GapBuffer::printBuffer() {
@@ -47,11 +47,10 @@ void GapBuffer::printBuffer() {
 
     if(p == this->gapStart) 
       std::cout<<"\nContents of gap ==========\n";
-    if(p>=this->gapStart && p<=this->gapEnd)
-      std::cout<<"_";
-    if(p == this->gapEnd)
+    if(p == this->gapEnd) 
       std::cout<<"\nGap Ended============\n";
-    
+    if(*p == '\0' && p!=this->bufferEnd)
+      std::cout<<"_";
     std::cout<<*p;
   }
   std::cout<<"\n";

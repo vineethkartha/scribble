@@ -12,5 +12,9 @@ int main() {
   gp.MoveGap(2);
   gp.addChar('E');
   gp.printBuffer();
+  gp.MoveGap(1);
+  gp.addChar('F');
+  gp.printBuffer();
+  
   return 0;
 }

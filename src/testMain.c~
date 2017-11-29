@@ -1,7 +1,0 @@
-#include<iostream>
-#include "include/GapBuffer.hpp"
-
-int main() {
-
-  return 0;
-}
