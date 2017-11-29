@@ -32,7 +32,7 @@ void GapBuffer::MoveGap(int pos) {
   auto pointer = this->bufferStart + pos;
   // assuming that the pointer is moved backwards
   int sizetoMove = this->cursorPos - pointer;
-  auto newPointer = this->bufferEnd -sizetoMove;
+  auto newPointer = this->gapEnd -sizetoMove;
   std::copy(pointer, pointer + (sizetoMove), newPointer);
   this->gapStart = pointer;
   this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
