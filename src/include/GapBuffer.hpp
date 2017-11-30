@@ -37,7 +37,8 @@ public:
   char* addChar(char c);
   void deleteChar(char);
   void resizeBuffer(unsigned int size);
-  void MoveGap(int pos);
+  void MoveGapBack(int pos);
+  void MoveGapFor(int pos);
 
   void printBuffer();
 };

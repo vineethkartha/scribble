@@ -28,7 +28,24 @@ char* GapBuffer::addChar(char c) {
 }
 
 
-void GapBuffer::MoveGap(int pos) {
+void GapBuffer::MoveGapFor(int pos) {
+  auto pointer = this->bufferStart + pos;
+  // assuming that the pointer is moved forwards
+  // Handle exceptions
+  if(pointer >= this->cursorPos && pointer <= this->gapEnd) {
+    return;
+  }
+  int sizetoMove = pointer -this->gapEnd;
+  auto pointerToMove = this->gapEnd;
+  std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
+  this->cursorPos = this->cursorPos + sizetoMove;
+  this->gapStart = this->cursorPos;
+  this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
+  //auto newPointer = this->gapEnd -sizetoMove;
+  for(auto p = this->gapStart; p < this->gapEnd; ++p)
+    *p ='\0';
+}
+void GapBuffer::MoveGapBack(int pos) {
   auto pointer = this->bufferStart + pos;
   // assuming that the pointer is moved backwards
   int sizetoMove = this->cursorPos - pointer;
