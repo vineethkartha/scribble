@@ -20,6 +20,7 @@ Move Cursor before C
 AB[______]CD ->GapStart = CurrentPointer
 GapEnd = gapStart+ (gapSize-insertCounter)
  */
+#include <string>
 class GapBuffer {
   unsigned int gapSize = 100;
   unsigned int insertCounter = 0;
@@ -35,10 +36,9 @@ public:
   //GapBuffer(FILE *file, int gapSize);
   ~GapBuffer();
   char* addChar(char c);
-  void deleteChar(char);
+  void deleteChar(int pos);
   void resizeBuffer(unsigned int size);
-  void MoveGapBack(int pos);
-  void MoveGapFor(int pos);
-
-  void printBuffer();
+  void MoveGap(int pos);
+  std::string printBuffer();
+  void Debugprint();
 };
