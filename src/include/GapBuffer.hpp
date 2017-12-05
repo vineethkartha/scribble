@@ -35,10 +35,13 @@ public:
   //GapBuffer(FILE *fileH);
   //GapBuffer(FILE *file, int gapSize);
   ~GapBuffer();
-  char* addChar(char c);
-  void deleteChar(int pos);
-  void resizeBuffer(unsigned int size);
+  
+  char* Insert(char c);
+  void Delete();
+  void Backspace();
   void MoveGap(int pos);
+  void resizeBuffer(unsigned int size);
   std::string printBuffer();
+  
   void Debugprint();
 };

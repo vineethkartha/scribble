@@ -1,6 +1,7 @@
 #include "include/GapBuffer.hpp"
 #include <algorithm>
 #include<iostream>
+
 GapBuffer::GapBuffer(int gapSize) {
   this->insertCounter = 0;
   this->gapSize = gapSize;
@@ -20,11 +21,30 @@ GapBuffer::~GapBuffer() {
   delete(this->buffer);
 }
 
-char* GapBuffer::addChar(char c) {
+char* GapBuffer::Insert(char c) {
   *(this->cursorPos) = c;
   this->cursorPos++;
+  this->gapStart++;
   this->insertCounter += 1;
   return this->cursorPos;
+}
+// In the example shown below the cursor is on E
+// that is why the gap is before E
+// abcd[  ]Efgh
+void GapBuffer::Delete() {
+  if(this->gapEnd == this->bufferEnd)
+    return;
+  *(this->gapEnd) ='\0';
+  this->gapEnd++;
+}
+
+void GapBuffer::Backspace() {
+  if(this->cursorPos == this->bufferStart)
+    return;
+  this->cursorPos--;
+  *(this->cursorPos) = '\0';
+  this->gapStart--;
+  this->insertCounter -=1;
 }
 
 void GapBuffer::MoveGap(int pos) {
