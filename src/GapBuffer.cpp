@@ -1,6 +1,7 @@
 #include "include/GapBuffer.hpp"
 #include <algorithm>
 #include <iostream>
+#include <assert.h>
 
 GapBuffer::GapBuffer(int gapSize) {
   this->insertCounter = 0;
@@ -20,6 +21,7 @@ GapBuffer::GapBuffer(FILE *fileH) {
 GapBuffer::~GapBuffer() {
   delete(this->buffer);
 }
+
 void GapBuffer::ResizeBuffer() {
 
   if(this->gapStart < this->gapEnd -1)
@@ -40,19 +42,40 @@ void GapBuffer::ResizeBuffer() {
   this->MoveGap(cursorPos);
 }
 
-char* GapBuffer::Insert(char c) {
+/**
+   * @name Insert
+   * This function inserts the symbol passed
+   * and increments the gapStart and the cursorPos pointer.
+   * Consider the text shown below with 4 blank spaces:
+   * This is a gap buffer [----]
+   *  			        ^
+   * on inserting the character 'i'
+   * The buffer will be as shown below:
+   * This is a gap buffer i[---]
+   *  			        ^			      
+   */
+void GapBuffer::Insert(char symbol) {
   this->ResizeBuffer();
-  *(this->cursorPos) = c;
+  *(this->cursorPos) = symbol;
   if(this->cursorPos < (this->bufferEnd - 1)) {
     this->cursorPos++;
     this->gapStart++;
   }
   this->insertCounter += 1;
-  return this->cursorPos;
 }
-// In the example shown below the cursor is on E
-// that is why the gap is before E
-// abcd[  ]Efgh
+
+/**
+   * @name Delete
+   * This function deletes the character under the cursor
+   * and increments the gapEnd pointer.
+   * Consider the text shown below with the cursor under d:
+   * This is a gap buffer [--]delete
+   *  			      ^
+   * The gap has 2 spaces left. After the delete operatio
+   * The buffer will be as shown below:
+   * This is a gap buffer [---]elete
+   *  			     ^			      
+   */
 void GapBuffer::Delete() {
   if(this->gapEnd == this->bufferEnd)
     return;
@@ -60,6 +83,22 @@ void GapBuffer::Delete() {
   this->gapEnd++;
 }
 
+/**
+   * @name Backspace
+   * This function deletes the character under the before
+   * the cursor and decrements the gapStart pointer and
+   * the cursorPos pointer.
+   * Consider the text shown below with the cursor under b:
+   * This is a gap buffer[--]backspace
+   *  			     ^
+   * without the gap the text would like like
+   * This is a gap bufferbackspace
+   *                     ^
+   * After the backspace operation
+   * The buffer will be as shown below:
+   * This is a gap buffe[---]backspace
+   *                         ^                    
+   */
 void GapBuffer::Backspace() {
   if(this->cursorPos == this->bufferStart)
     return;
@@ -82,13 +121,11 @@ void GapBuffer::MoveGap(int pos) {
 
   if(NeedtoMove) {
     if(MoveForward) {
-      //this->MoveGapForward(pointer);
       int sizetoMove = pointer - this->gapEnd;
       auto pointerToMove = this->gapEnd;
       std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
       this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
     } else {
-      //this->MoveGapBackward(pointer);
       int sizetoMove = this->cursorPos - pointer;
       auto pointerToMove = this->gapEnd -sizetoMove;
       std::copy(pointer, pointer + (sizetoMove), pointerToMove);
@@ -99,17 +136,38 @@ void GapBuffer::MoveGap(int pos) {
     // Clear the gap
     for(auto p = this->gapStart; p <= this->gapEnd; ++p)
       *p ='\0';
-    *(this->bufferEnd + 1) = '\0'; 
+    *(this->bufferEnd + 1) = '\0';
   }
 }
 
-// THis is a debug print
+/**
+ * @name printBuffer
+ * This function returns the contents of the entire buffer as a string
+ * It ignores the gap in between.
+ */
+std::string GapBuffer::printBuffer() {
+  std::string buff;
+  for(auto ptr = this->bufferStart; ptr < this->bufferEnd; ++ptr) {
+    // Skip the gap this should be empty.
+    if(ptr >= this->gapStart &&
+       ptr <= this->gapEnd) {
+      // xxx TODO check why this assertion fails.
+      //assert(*ptr == '\0');
+      continue;
+    }
+    buff +=*ptr;
+  }
+  return buff;
+}
+
+
+// THis is a debug print surround it with NDEBUG
 void GapBuffer::Debugprint() {
   for(auto p = this->bufferStart; p <= this->bufferEnd; ++p) {
 
-    if(p == this->gapStart) 
+    if(p == this->gapStart)
       std::cout<<"\nContents of gap ==========\n";
-    if(p == this->gapEnd) 
+    if(p == this->gapEnd)
       std::cout<<"\nGap Ended============\n";
     if(*p == '\0' && p!=this->bufferEnd)
       std::cout<<"_";
@@ -117,21 +175,3 @@ void GapBuffer::Debugprint() {
   }
   std::cout<<"\n";
 }
-
-std::string GapBuffer::printBuffer() {
-  std::string buff;
-  int c =0;
-  for(auto ptr = this->bufferStart; ptr < this->bufferEnd; ++ptr) {
-    c++;
-    // Skip the gap this should be empty.
-    if(ptr >= this->gapStart &&
-       ptr <= this->gapEnd)
-      continue;
-    //std::cout<<*ptr;
-    
-    buff +=*ptr;
-  }
-  //std::cout<<c<<"\n";
-  return buff;
-}
-
