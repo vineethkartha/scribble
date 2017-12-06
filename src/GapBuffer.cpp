@@ -1,6 +1,6 @@
 #include "include/GapBuffer.hpp"
 #include <algorithm>
-#include<iostream>
+#include <iostream>
 
 GapBuffer::GapBuffer(int gapSize) {
   this->insertCounter = 0;
@@ -20,11 +20,33 @@ GapBuffer::GapBuffer(FILE *fileH) {
 GapBuffer::~GapBuffer() {
   delete(this->buffer);
 }
+void GapBuffer::ResizeBuffer() {
+
+  if(this->gapStart < this->gapEnd -1)
+    return;
+  unsigned int size = this->gapSize * 2;
+  char *tempBuffer = new char[size];
+  std::copy(this->bufferStart, this->bufferEnd, tempBuffer);
+  auto cursorPos = this->cursorPos - this->bufferStart;
+  auto origSize = this->bufferEnd - this->bufferStart;
+  delete(this->buffer);
+  this->buffer = tempBuffer;
+  this->bufferStart = tempBuffer;
+  this->bufferEnd = this->bufferStart + size;
+  this->cursorPos = this->bufferStart + cursorPos;
+  this->gapStart = this->bufferStart + origSize;
+  this->gapEnd = this->bufferEnd;
+  this->gapSize = size;
+  this->MoveGap(cursorPos);
+}
 
 char* GapBuffer::Insert(char c) {
+  this->ResizeBuffer();
   *(this->cursorPos) = c;
-  this->cursorPos++;
-  this->gapStart++;
+  if(this->cursorPos < (this->bufferEnd - 1)) {
+    this->cursorPos++;
+    this->gapStart++;
+  }
   this->insertCounter += 1;
   return this->cursorPos;
 }
@@ -51,14 +73,17 @@ void GapBuffer::MoveGap(int pos) {
   auto pointer = this->bufferStart + pos;
   // If the pointer is between the current position and
   // the gap end we should not move.
+  if(pointer < this->bufferStart ||
+     pointer > this->bufferEnd)
+    return;
   bool NeedtoMove = !(pointer >= this->cursorPos
-		      && pointer <= this->gapEnd);
+		      && pointer <= this->gapEnd + 1);
   bool MoveForward = (pointer > this->cursorPos);
 
   if(NeedtoMove) {
     if(MoveForward) {
       //this->MoveGapForward(pointer);
-      int sizetoMove = pointer -this->gapEnd;
+      int sizetoMove = pointer - this->gapEnd;
       auto pointerToMove = this->gapEnd;
       std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
       this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
@@ -70,44 +95,13 @@ void GapBuffer::MoveGap(int pos) {
       this->cursorPos = pointer;
     }
     this->gapStart =this->cursorPos;
-    this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
+    this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter - 1);
     // Clear the gap
-    for(auto p = this->gapStart; p < this->gapEnd; ++p)
+    for(auto p = this->gapStart; p <= this->gapEnd; ++p)
       *p ='\0';
+    *(this->bufferEnd + 1) = '\0'; 
   }
 }
-/* xxx TODO TO Be deleted 
-void GapBuffer::MoveGapForward(char *pointer) {
-  
-  // assuming that the pointer is moved forwards
-  // Handle exceptions
-  if(pointer >= this->cursorPos && pointer <= this->gapEnd) {
-    return;
-  }
-  int sizetoMove = pointer -this->gapEnd;
-  auto pointerToMove = this->gapEnd;
-  std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
-  this->cursorPos = this->cursorPos + sizetoMove;
-  this->gapStart = this->cursorPos;
-  this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
-  //auto newPointer = this->gapEnd -sizetoMove;
-  for(auto p = this->gapStart; p < this->gapEnd; ++p)
-    *p ='\0';
-}
-void GapBuffer::MoveGapBackward(char *pointer) {
-  
-  // assuming that the pointer is moved backwards
-  int sizetoMove = this->cursorPos - pointer;
-  auto newPointer = this->gapEnd -sizetoMove;
-  std::copy(pointer, pointer + (sizetoMove), newPointer);
-  this->gapStart = pointer;
-  this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
-  // Clear the gap
-  for(auto p = this->gapStart; p < this->gapEnd; ++p)
-    *p ='\0';
-  this->cursorPos = this->gapStart;
-}
-*/
 
 // THis is a debug print
 void GapBuffer::Debugprint() {
@@ -126,12 +120,18 @@ void GapBuffer::Debugprint() {
 
 std::string GapBuffer::printBuffer() {
   std::string buff;
-  for(auto p = this->bufferStart; p<=this->bufferEnd; ++p) {
-    //std::cout<<*p;
-    if(*p != '\0')
-      buff +=*p;
+  int c =0;
+  for(auto ptr = this->bufferStart; ptr < this->bufferEnd; ++ptr) {
+    c++;
+    // Skip the gap this should be empty.
+    if(ptr >= this->gapStart &&
+       ptr <= this->gapEnd)
+      continue;
+    //std::cout<<*ptr;
+    
+    buff +=*ptr;
   }
-  //buff += '\0';
+  //std::cout<<c<<"\n";
   return buff;
 }
 

@@ -17,6 +17,6 @@ GapBuffer.o:GapBuffer.cpp
 clean:
 	rm *.o *.log
 buildtests:$(TestFiles)
-	$(CXX) -o unittest -lboost_unit_test_framework $(TestFiles)
+	$(CXX)  $(CFLAGS) -o unittest -lboost_unit_test_framework $(TestFiles)
 runtest:unittest
 	./unittest >report.log

@@ -40,7 +40,7 @@ public:
   void Delete();
   void Backspace();
   void MoveGap(int pos);
-  void resizeBuffer(unsigned int size);
+  void ResizeBuffer();
   std::string printBuffer();
   
   void Debugprint();
