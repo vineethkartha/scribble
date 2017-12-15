@@ -13,12 +13,13 @@ public:
   VT100gui();
   ~VT100gui();
   
-  void exitException(const char *s);
+  void exitonException(const char *s);
   //void revertToNormalMode();
   //void startRawMode(); 
   void editorDrawRows();
   void editorRefreshScreen();
   char editorReadKey();
-
+  void editorProcessKeypress();
+  int getCursorPosition(int *rows, int *cols);
 
 };
