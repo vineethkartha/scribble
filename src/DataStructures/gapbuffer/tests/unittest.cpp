@@ -66,9 +66,14 @@ BOOST_AUTO_TEST_CASE(MoveAndInsert)
   gapB.Insert('b');
   gapB.Insert('c');
   gapB.Insert('d');
+  gapB.Debugprint();
   gapB.MoveGap(3);
+  gapB.Debugprint();
   gapB.MoveGap(2);
+  gapB.Debugprint();
   gapB.Insert('E');
+  gapB.Debugprint();
+  std::cout<<gapB.printBuffer()<<"\n";
   BOOST_CHECK(gapB.printBuffer() == "abEcd");
   /*gapB.MoveGap(8);
   gapB.Insert('F');
@@ -88,6 +93,7 @@ BOOST_AUTO_TEST_CASE(ResizeAndInsert)
   gapB.Insert('d');
   gapB.MoveGap(2);
   gapB.Insert('E');
+  std::cout<<gapB.printBuffer()<<"\n";
   BOOST_CHECK(gapB.printBuffer() == "abEcd");
 }
 
