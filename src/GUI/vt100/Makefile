@@ -6,8 +6,8 @@ CFLAGS = -std=c++11 -g
 #TestFiles = ./tests/unittest.cpp
 # Libs=#whatever libraries you need to provide to g++
 
-guilib.o:guilib.cpp
-	$(CXX) $(CFLAGS) -I $(Includes) -c -o ../../guilib.o guilib.cpp
+vt100terminal.o:vt100terminal.cpp
+	$(CXX) $(CFLAGS) -I $(Includes) -c -o ../../vt100terminal.o vt100terminal.cpp
 
 clean:
 	rm *.o *.log

@@ -5,15 +5,15 @@ OutputFileName= Scribble.out
 
 
 # Libs=#whatever libraries you need to provide to g++
-Scribble: GapBuffer.o testMain.o guilib.o
-	$(CXX) $(CFLAGS) -o Scribble GapBuffer.o testMain.o guilib.o
+Scribble: GapBuffer.o testMain.o vt100terminal.o
+	$(CXX) $(CFLAGS) -o Scribble GapBuffer.o testMain.o vt100terminal.o
 
 testMain.o:testMain.cpp
 	$(CXX) $(CFLAGS) -I $(Includes) -c -o testMain.o testMain.cpp 
 
 GapBuffer.o:DataStructures/gapbuffer/GapBuffer.cpp
 	$(MAKE) -C DataStructures/gapbuffer
-guilib.o:GUI/vt100/guilib.cpp
+vt100terminal.o:GUI/vt100/vt100terminal.cpp
 	$(MAKE) -C GUI/vt100
 
 clean:

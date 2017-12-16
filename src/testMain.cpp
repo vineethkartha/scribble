@@ -1,73 +1,57 @@
 #include<iostream>
 #include "DataStructures/gapbuffer/include/GapBuffer.hpp"
-#include "GUI/vt100/include/guilib.hpp"
+#include "GUI/vt100/include/vt100terminal.hpp"
 #include <string.h>
+#include <fstream>
 
 int main() {
-  GapBuffer gp(2);
+  GapBuffer gp(20);
   VT100gui gui;
+  std::ofstream myfile;
+  myfile.open("untitled.txt");
+  int ch=0;
   int rows, cols;
-  while (1) {
-    char c = gui.editorReadKey();
-    char *pc = &c;
-    gui.getCursorPosition(&rows, &cols);
-    //write(STDOUT_FILENO, &rows,1);
-    //write(STDOUT_FILENO, cols,1);
-    switch (c) {
-      //Impelemnt the arrow keys
-    
-    case CTRL_KEY('q'):
-      goto EXIT_POINT;
+  std::string ptr;
+  while (ch != KEYS::CODES::EXIT_TERM) {
+    ch = gui.VT100CommandProcess();
+    gui.getCursorPosition(&rows,&cols);
+
+    switch(ch) {
+    case KEYS::CODES::UP_ARROW:
       break;
-      case 'A':
-	{
-	  write(STDOUT_FILENO, "Hello", 5);
-	  break;
-	}
+    case KEYS::CODES::DOWN_ARROW:
+    case KEYS::CODES::LEFT_ARROW: 
+      gp.MoveGap(--cols);
+      //write(STDOUT_FILENO, ptr.c_str(),ptr.size());
+      break;
+    case KEYS::CODES::RIGHT_ARROW:
+      break;
+    case KEYS::CODES::EXIT_TERM:
+      break;
+      case KEYS::CODES::SAVE_DOC:
+	myfile<<gp.printBuffer();
+	break;
     case '\r':
-      {
-	char buf[15];
-	//write(STDOUT_FILENO, "Hello", 5);
 	gp.Insert('\n');
 	gp.Insert('\r');
-	rows++;
-	snprintf(buf, sizeof(buf), "\x1b[%d;%dH",rows,1);
-	write(STDOUT_FILENO,buf,strlen(buf));
 	break;
-      }
-    case 127:
-      {
-      //write(STDOUT_FILENO, "\x1b[H", 3);
-      cols--;
-      char buf[32];
-      //snprintf(buf, sizeof(buf), "\x1b[%d;%dH",rows,cols);
-      
-      gp.Backspace();
-      auto ptr = gp.printBuffer();
-      write(STDOUT_FILENO, "\x1b[J", 4);
-      write(STDOUT_FILENO, "\x1b[H", 3);
-      //write(STDOUT_FILENO,buf,strlen(buf));
-      write(STDOUT_FILENO, ptr.c_str(),ptr.size());
-      
-      break;
-      }
+    case KEYS::CODES::BACKSPACE:
+	gp.Backspace();
+	ptr = gp.printBuffer();
+	write(STDOUT_FILENO, ptr.c_str(),ptr.size());
+	break;
     default:
-      {
-      //std::cout<<c<<"\n";
-      printf("(%d) %c\n",c,c);
-      gp.Insert(c);
-      auto ptr = gp.printBuffer();
-      write(STDOUT_FILENO, "\x1b[1J", 4);
-      write(STDOUT_FILENO, "\x1b[H", 3);
-      write(STDOUT_FILENO, ptr.c_str(),ptr.size());
-      break;
-      }
+	gp.Insert(ch);
+	ptr = gp.printBuffer();
+	write(STDOUT_FILENO, ptr.c_str(),ptr.size());
+	break;
     }
+    ptr = gp.printBuffer();
+    //gui.statusBar(ptr, rows);
   }
- EXIT_POINT:
+  myfile.close();
   std::cout<<"\n\n";
   auto a = gp.printBuffer();
-  std::cout<<a<<"\n\n";
-  std::cout<<rows<<"\n"<<cols<<"\n";
+  std::cout<<a<<"\n\n"<<rows<<"\n"<<cols<<"\n";
   return 0;
 }
