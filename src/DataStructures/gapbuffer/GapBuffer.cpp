@@ -12,6 +12,8 @@ GapBuffer::GapBuffer(int gapSize) {
   this->gapStart = this->buffer;
   this->gapEnd = this->gapStart + this->gapSize;
   this->bufferEnd = this->bufferStart + this->gapSize;
+  for(auto p = this->bufferStart; p <= this->bufferEnd; ++p)
+      *p ='\0';
 }
 
 /* implement the cons with a file input
@@ -127,16 +129,16 @@ void GapBuffer::MoveGap(int pos) {
       this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
     } else {
       int sizetoMove = this->cursorPos - pointer;
-      auto pointerToMove = this->gapEnd -sizetoMove;
+      auto pointerToMove = this->gapEnd - sizetoMove;
       std::copy(pointer, pointer + (sizetoMove), pointerToMove);
       this->cursorPos = pointer;
     }
     this->gapStart =this->cursorPos;
-    this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter - 1);
-    // Clear the gap
-    for(auto p = this->gapStart; p <= this->gapEnd; ++p)
+    this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
+    // Clear the gap 
+    for(auto p = this->gapStart; p < this->gapEnd; ++p)
       *p ='\0';
-    *(this->bufferEnd + 1) = '\0';
+    *(this->bufferEnd) = '\0';
   }
 }
 
@@ -147,16 +149,17 @@ void GapBuffer::MoveGap(int pos) {
  */
 std::string GapBuffer::printBuffer() {
   std::string buff;
-  for(auto ptr = this->bufferStart; ptr < this->bufferEnd; ++ptr) {
+  for(auto ptr = this->bufferStart; ptr <= this->bufferEnd; ++ptr) {
     // Skip the gap this should be empty.
     if(ptr >= this->gapStart &&
-       ptr <= this->gapEnd) {
+       ptr < this->gapEnd) {
       // xxx TODO check why this assertion fails.
       //assert(*ptr == '\0');
       continue;
     }
-    buff +=*ptr;
+    buff += *ptr;
   }
+  buff += '\0';
   return buff;
 }
 
