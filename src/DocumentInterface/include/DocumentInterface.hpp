@@ -13,4 +13,9 @@ public:
   //  Document(std::string fName); 
 
   ~DocumentInterface();
+  void NavigateBuffer(int cols, int rows);
+  void SaveBufferToFile();
+  void OpenFileToBuffer();
+  void UpdateBuffer(int ch);
+  std::string printGapBuffer();
 };
