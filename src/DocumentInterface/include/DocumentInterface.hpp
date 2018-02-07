@@ -1,15 +1,16 @@
+#include <fstream>
 
-class Document {
-  FILE *fileHandler;
+class GapBuffer;
+
+class DocumentInterface {
+  std::ofstream fileHandler;
   std::string fileName = "untitled";
-  GapBuffer gapBuff(1000);
+  GapBuffer *gapBuff;
 
 public:
-  Document(); // make sure this opens as untitledxx
+  static int fileCounter;
+  DocumentInterface(); // make sure this opens as untitledxx
+  //  Document(std::string fName); 
 
-  // Check if this file is already opened ,
-  // if opened point to that instead of creating a new object
-  Document(std::string fName); 
-
-  ~Document();
-}
+  ~DocumentInterface();
+};

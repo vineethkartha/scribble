@@ -1,11 +1,14 @@
 #include<iostream>
 #include "DataStructures/gapbuffer/include/GapBuffer.hpp"
+#include "DocumentInterface/include/DocumentInterface.hpp"
 #include "GUI/vt100/include/vt100terminal.hpp"
 #include <string.h>
 #include <fstream>
 
 int main() {
   GapBuffer gp(20);
+  DocumentInterface dp;
+  DocumentInterface dp1;
   VT100gui gui;
   std::ofstream myfile;
   myfile.open("untitled.txt");
