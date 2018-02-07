@@ -1,0 +1,4 @@
+class Document {
+  FILE *fileHandler;
+  std::string fileName = "untitled";
+}
