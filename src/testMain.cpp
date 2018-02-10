@@ -13,7 +13,7 @@ int main() {
   int ch=0;
   std::string ptr;
   gui.clearScreen();
-  
+  gui.editorRefreshScreen(dp.getFileName());
   while (ch != KEYS::CODES::EXIT_TERM) {
     ch = gui.VT100CommandProcess();    
     switch(ch) {
@@ -34,7 +34,7 @@ int main() {
       
     case KEYS::CODES::BACKSPACE:
     default:
-      gui.clearScreen();
+      gui.editorRefreshScreen(dp.getFileName());
       dp.UpdateBuffer(ch);
       ptr = dp.printGapBuffer();
       write(STDOUT_FILENO, ptr.c_str(),ptr.size());
@@ -42,6 +42,7 @@ int main() {
       
       break;
       }
+    //gui.statusBar("asa",2);
     //ptr = dp.printGapBuffer();
     //write(STDOUT_FILENO, ptr.c_str(),ptr.size());
     //gui.statusBar(ptr, rows);

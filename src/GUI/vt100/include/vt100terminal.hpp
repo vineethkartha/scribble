@@ -25,18 +25,18 @@ class VT100gui {
   int currCol;
   struct termios orig_termios;
   void getWinSize();
-  void CommandWriterHelper();
+  void CommandWriterHelper(const std::string command);
 public:
   VT100gui();
   ~VT100gui();
   void exitonException(const char *s);
   void editorDrawRows();
   void clearScreen();
-  void editorRefreshScreen();
+  void editorRefreshScreen(std::string fName);
   int ReadKey();
   int VT100CommandProcess();
   int getCursorPosition();
-  void statusBar(std::string, int rows);
+  void statusBar(std::string fName);
   int getRow() const;
   int getColumn() const;
 

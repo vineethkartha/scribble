@@ -14,6 +14,7 @@ public:
   //  Document(std::string fName); 
 
   ~DocumentInterface();
+  std::string getFileName() const;
   void NavigateBuffer(int cols, int rows);
   void SaveBufferToFile();
   void OpenFileToBuffer();

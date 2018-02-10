@@ -26,6 +26,9 @@ DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
     }*/
 }
 
+std::string DocumentInterface::getFileName() const {
+  return fileName;
+}
 DocumentInterface::~DocumentInterface() {
   fileCounter = fileCounter?fileCounter -= 1:0;
   fileHandler.close(); 

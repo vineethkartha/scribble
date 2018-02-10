@@ -3,10 +3,13 @@
 #include <termios.h>
 #include<iostream>
 #include <sys/ioctl.h>
-
-void VT100gui::CommandWriterHelper() {
-
+#include <assert.h>
+void VT100gui::CommandWriterHelper(const std::string command) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), command.c_str(),0);
+  write(STDOUT_FILENO,command.c_str(),command.length());
 }
+
 VT100gui::VT100gui() {
   if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
     exitonException("tcgetattr");
@@ -17,6 +20,8 @@ VT100gui::VT100gui() {
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
   getWinSize();
+  currRow = 0;
+  currCol = 0;
 }
 
 VT100gui::~VT100gui() {
@@ -25,23 +30,22 @@ VT100gui::~VT100gui() {
 }
 
 void VT100gui::clearScreen() {
-  write(STDOUT_FILENO, "\x1b[2J", 4);
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  CommandWriterHelper("\x1b[2J\x1b[H");
 }
 
 void VT100gui::getWinSize() {
   struct winsize ws;
   if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+    assert(false);
     return;
   } else {
-    numOfRows = ws.ws_col;
-    numOfCols = ws.ws_row;
+    numOfCols = ws.ws_col;
+    numOfRows = ws.ws_row;
   }
 }
 
 void VT100gui::exitonException(const char *s) {
-  write(STDOUT_FILENO, "\x1b[2J", 4);
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  CommandWriterHelper("\x1b[2J\x1b[H");
   perror(s);
   exit(1);
 }
@@ -53,11 +57,9 @@ void VT100gui::editorDrawRows() {
   }
 }
 
-void VT100gui::editorRefreshScreen() {
-  char buf[10];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH",0,0);
-  //snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,currCol);
-  write(STDOUT_FILENO,buf,strlen(buf));
+void VT100gui::editorRefreshScreen(std::string fName) {
+  CommandWriterHelper("\x1b[K\x1b[H");
+  statusBar(fName);
 }
 
 
@@ -172,21 +174,20 @@ int VT100gui::getColumn() const {
   return currCol;
 }
 
-void VT100gui::statusBar(std::string ptr, int rows) {
+void VT100gui::statusBar(std::string fName) {
+  getWinSize();
+  // take cursor to the last line of the screen
+  std::string cmd = "\x1b["+std::to_string(numOfRows)+";0H"; 
+  CommandWriterHelper(cmd);
+  CommandWriterHelper("\x1b[7m");
 
-  /*
-  char buf[15];
-  write(STDOUT_FILENO, ptr.c_str(),ptr.size());
-  write(STDOUT_FILENO, "\x1b[7m", 4);
-
-  // rest of code here
-  char status[80];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH",rowSize,1);
-  write(STDOUT_FILENO,buf,strlen(buf));
-  snprintf(status, sizeof(status), "%.20s - %d lines",
-    "untitled", rows);
-  write(STDOUT_FILENO, status, 20);
-  write(STDOUT_FILENO, "\x1b[m", 3);
-  */
-  //  abAppend(ab, "\x1b[m", 3);
+  int len = 0;
+  std::string statusMsg = fName + " Line:" + std::to_string(currRow);
+  CommandWriterHelper(statusMsg);
+  while (len < (numOfCols-statusMsg.length())) {
+    CommandWriterHelper(" ");
+    len++;
+  }
+  CommandWriterHelper("\x1b[m");
+  CommandWriterHelper("\x1b[0;0H");
 }
