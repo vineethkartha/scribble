@@ -6,8 +6,8 @@ TestFiles = ./tests/unittest.cpp
 # Libs=#whatever libraries you need to provide to g++
 GapBuffer.o:GapBuffer.cpp
 	$(CXX) $(CFLAGS) -I $(Includes) -c -o ../../GapBuffer.o GapBuffer.cpp
-	$(MAKE) buildtests		
-	$(MAKE) runtest
+#	$(MAKE) buildtests		
+#	$(MAKE) runtest
 clean:
 	rm *.o *.log
 buildtests:$(TestFiles)

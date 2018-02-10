@@ -8,6 +8,7 @@
 struct KEYS {
 enum CODES{
   SAVE_DOC   = CTRL_KEY('s'),
+  OPEN_DOC   = CTRL_KEY('o'),
   EXIT_TERM  = CTRL_KEY('q'),
   BACKSPACE  = 127,
   UP_ARROW   = 1000,
@@ -16,23 +17,27 @@ enum CODES{
   RIGHT_ARROW
   };
 };
-class VT100gui {
-  struct termios orig_termios;
 
+class VT100gui {
+  int numOfRows;
+  int numOfCols;
+  int currRow;
+  int currCol;
+  struct termios orig_termios;
   void getWinSize();
+  void CommandWriterHelper();
 public:
   VT100gui();
   ~VT100gui();
-  int rowSize;
-  int colSize;
   void exitonException(const char *s);
-  //void revertToNormalMode();
-  //void startRawMode(); 
   void editorDrawRows();
+  void clearScreen();
   void editorRefreshScreen();
   int ReadKey();
   int VT100CommandProcess();
-  int getCursorPosition(int *rows, int *cols);
+  int getCursorPosition();
   void statusBar(std::string, int rows);
+  int getRow() const;
+  int getColumn() const;
 
 };

@@ -10,6 +10,7 @@ class DocumentInterface {
 public:
   static int fileCounter;
   DocumentInterface(); // make sure this opens as untitledxx
+  DocumentInterface(std::string fileName); // make sure this opens as untitledxx
   //  Document(std::string fName); 
 
   ~DocumentInterface();

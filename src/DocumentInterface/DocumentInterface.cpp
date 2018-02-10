@@ -10,16 +10,31 @@ DocumentInterface::DocumentInterface() {
   fileCounter += 1;
   fileHandler.open(fileName);
   gapBuff = new GapBuffer(100);
-  std::cout<<fileName; // debug statement
+}
+
+DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
+  /*  fileHandler.open(fileName);
+  gapBuff = new GapBuffer(100);
+  char c;
+  while(fileHandler.get(c)) {
+    if(c=='\n') {
+      gapBuff->Insert('\r');
+      gapBuff->Insert('\n');
+    } else {
+      gapBuff->Insert(c);
+    }
+    }*/
 }
 
 DocumentInterface::~DocumentInterface() {
   fileCounter = fileCounter?fileCounter -= 1:0;
-  fileHandler.close();
+  fileHandler.close(); 
+  delete gapBuff;
 }
 
 void DocumentInterface::NavigateBuffer(int cols, int rows) {
-  gapBuff->MoveGap(--cols);
+  //currently this implements only the left key
+  gapBuff->MoveGap(cols);
 }
 
 void DocumentInterface::UpdateBuffer(int ch) {
@@ -35,6 +50,14 @@ void DocumentInterface::UpdateBuffer(int ch) {
     gapBuff->Insert(ch);
     break;
   }
+}
+
+/*void DocumentInterface::OpenFileToBuffer(std::string fileName) {
+  
+  }*/
+
+void DocumentInterface::SaveBufferToFile() {
+  fileHandler<<gapBuff->printBuffer();
 }
 
 std::string DocumentInterface::printGapBuffer() {
