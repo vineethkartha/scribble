@@ -43,8 +43,6 @@ public:
    *@brief Constructor
    */
   explicit GapBuffer(int gapSize);
-  //GapBuffer(FILE *fileH);
-  //GapBuffer(FILE *file, int gapSize);
   ~GapBuffer();
 
   /**

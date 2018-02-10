@@ -39,5 +39,6 @@ public:
   void statusBar(std::string fName);
   int getRow() const;
   int getColumn() const;
-
+  void writeContent(std::string content);
+  void DrawCursor(int row, int column);
 };

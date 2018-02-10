@@ -16,10 +16,6 @@ GapBuffer::GapBuffer(int gapSize) {
       *p ='\0';
 }
 
-/* implement the cons with a file input
-GapBuffer::GapBuffer(FILE *fileH) {
-}*/
-
 GapBuffer::~GapBuffer() {
   delete(this->buffer);
 }
