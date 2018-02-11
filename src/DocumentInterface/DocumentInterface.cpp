@@ -14,7 +14,7 @@ DocumentInterface::DocumentInterface() {
 }
 
 DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
-  /*  fileHandler.open(fileName);
+  fileHandler.open(fileName, std::fstream::in | std::fstream::out | std::fstream::app);
   gapBuff = new GapBuffer(100);
   char c;
   while(fileHandler.get(c)) {
@@ -24,7 +24,8 @@ DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
     } else {
       gapBuff->Insert(c);
     }
-    }*/
+  }
+  fileNameisSet = true;
 }
 
 std::string DocumentInterface::getFileName() const {
@@ -67,14 +68,10 @@ bool DocumentInterface::isDirtyState() const {
   return dirtyFlag;
 }
 
-/*void DocumentInterface::OpenFileToBuffer(std::string fileName) {
-  
-  }*/
-
 void DocumentInterface::SaveBufferToFile(std::string fName) {
   if(!fileHandler.is_open()) {
     fileName = fName;
-    fileHandler.open(fName);
+    fileHandler.open(fName, std::fstream::in | std::fstream::out | std::fstream::app);
     fileNameisSet = true;
   }
   fileHandler<<gapBuff->printBuffer();

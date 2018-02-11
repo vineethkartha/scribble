@@ -3,7 +3,7 @@
 class GapBuffer;
 
 class DocumentInterface {
-  std::ofstream fileHandler;
+  std::fstream fileHandler;
   std::string fileName = "untitled";
   int dirtyFlag;
   bool fileNameisSet;
@@ -22,7 +22,6 @@ public:
   
   void NavigateBuffer(int cols, int rows);
   void SaveBufferToFile(std::string fName = "");
-  void OpenFileToBuffer();
   void UpdateBuffer(int ch);
   std::string printGapBuffer();
 };
