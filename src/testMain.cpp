@@ -11,9 +11,11 @@ int main() {
   DocumentInterface dp;
   VT100gui gui;
   int ch=0;
+  bool cmdFlag = 0;
+  std::string str;
   std::string ptr;
   gui.clearScreen();
-  gui.editorRefreshScreen(dp.getFileName());
+  gui.editorRefreshScreen(dp.getFileName(), dp.isDirtyState());
   while (ch != KEYS::CODES::EXIT_TERM) {
     ch = gui.VT100CommandProcess();    
     switch(ch) {
@@ -24,23 +26,35 @@ int main() {
       dp.NavigateBuffer(gui.getColumn(),gui.getRow());
       break;
     case KEYS::CODES::OPEN_DOC:
+      cmdFlag = 1;
       break;
     case KEYS::CODES::EXIT_TERM:
-      gui.clearScreen();
       break;
     case KEYS::CODES::SAVE_DOC:
-      dp.SaveBufferToFile();
-      break;
+      if(!dp.getFileNameisSet()) {
+	cmdFlag = 1;
+	str = gui.commandInputs();
+	dp.SaveBufferToFile(str);
+      } else {
+	dp.SaveBufferToFile();
+      }
       
+      gui.DrawCursor(gui.getRow(), gui.getColumn());
+      break;
+    case '\r':
+      cmdFlag = 0;
     case KEYS::CODES::BACKSPACE:
     default:
-      gui.editorRefreshScreen(dp.getFileName());
+      cmdFlag = 0;
       dp.UpdateBuffer(ch);
-      ptr = dp.printGapBuffer();
-      gui.writeContent(ptr);
-      //write(STDOUT_FILENO, ptr.c_str(),ptr.size());
       break;
     }
+    if(!cmdFlag) {
+      gui.editorRefreshScreen(dp.getFileName(), dp.isDirtyState());
+      ptr = dp.printGapBuffer();
+      gui.writeContent(ptr);
+    }
   }
+  gui.clearScreen();
   return 0;
 }

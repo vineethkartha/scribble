@@ -52,9 +52,9 @@ void VT100gui::editorDrawRows() {
   }
 }
 
-void VT100gui::editorRefreshScreen(std::string fName) {
-  CommandWriterHelper("\x1b[K\x1b[H");
-  statusBar(fName);
+void VT100gui::editorRefreshScreen(std::string fName, bool dirty) {
+  CommandWriterHelper("\x1b[K");
+  statusBar(fName, dirty);
 }
 
 
@@ -119,7 +119,8 @@ int VT100gui::VT100CommandProcess() {
   case '\r':
     {
       currRow++;
-      DrawCursor(currRow,0);
+      currCol = 0;
+      DrawCursor(currRow,currCol);
       return '\r';
     }
   case KEYS::CODES::BACKSPACE:
@@ -158,15 +159,19 @@ int VT100gui::getColumn() const {
   return currCol;
 }
 
-void VT100gui::statusBar(std::string fName) {
+void VT100gui::statusBar(std::string fName, bool dirty) {
   getWinSize();
-  // take cursor to the last line of the screen
-  std::string cmd = "\x1b["+std::to_string(numOfRows)+";0H"; 
+  // take cursor to the second last line of the screen
+  std::string cmd = "\x1b["+std::to_string(numOfRows-1)+";0H"; 
   CommandWriterHelper(cmd);
   CommandWriterHelper("\x1b[7m");
 
   int len = 0;
-  std::string statusMsg = fName + " Line:" + std::to_string(currRow);
+  std::string statusMsg = fName;
+  if(dirty)
+    statusMsg = statusMsg + "* Line:" + std::to_string(currRow);
+  else
+    statusMsg = statusMsg + " Line:" + std::to_string(currRow);
   CommandWriterHelper(statusMsg);
   while (len < (numOfCols-statusMsg.length())) {
     CommandWriterHelper(" ");
@@ -174,6 +179,43 @@ void VT100gui::statusBar(std::string fName) {
   }
   CommandWriterHelper("\x1b[m");
   CommandWriterHelper("\x1b[0;0H");
+}
+
+std::string VT100gui::commandInputs() {
+  DrawCursor(numOfRows,0);
+  int cmdRows = numOfRows;
+  int cmdCol = 0;
+  char buf[1000];
+  int i = 0;
+  bool enter = 1;
+  while(enter) {
+    int  ch = ReadKey();
+    switch(ch) {
+    case KEYS::CODES::UP_ARROW:
+    case KEYS::CODES::DOWN_ARROW:
+    case KEYS::CODES::LEFT_ARROW: 
+    case KEYS::CODES::RIGHT_ARROW:
+    case KEYS::CODES::OPEN_DOC:
+    case KEYS::CODES::EXIT_TERM:
+    case '\r':
+      enter = 0;
+      buf[i] = '\0';
+      CommandWriterHelper("\x1b[K");
+      break;
+    case KEYS::CODES::BACKSPACE:
+    default:
+      buf[i++] = ch;
+      cmdCol++;
+      break;
+    }
+    editorRefreshScreen("Enter FileName", false);
+    DrawCursor(cmdRows , 0);
+    write(STDOUT_FILENO, buf,i);
+    DrawCursor(cmdRows , cmdCol);
+  }
+  editorRefreshScreen("Enter FileName", false);
+  DrawCursor(currRow,currCol);
+  return std::string(buf);
 }
 
 void VT100gui::writeContent(std::string content) {
