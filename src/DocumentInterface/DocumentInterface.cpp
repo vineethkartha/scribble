@@ -6,10 +6,11 @@
 int DocumentInterface::fileCounter = 0;
 
 DocumentInterface::DocumentInterface() {
-  fileName = fileName + std::to_string(fileCounter) + ".txt";
+  fileName = "";
   fileCounter += 1;
-  fileHandler.open(fileName);
+  fileNameisSet = false;
   gapBuff = new GapBuffer(100);
+  dirtyFlag = 0;
 }
 
 DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
@@ -24,6 +25,13 @@ DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
       gapBuff->Insert(c);
     }
     }*/
+}
+
+std::string DocumentInterface::getFileName() const {
+  if(fileName == "") {
+    return("untitled" + std::to_string(fileCounter) + ".txt");
+  }
+  return fileName;
 }
 
 DocumentInterface::~DocumentInterface() {
@@ -42,24 +50,40 @@ void DocumentInterface::UpdateBuffer(int ch) {
   case '\r':
     gapBuff->Insert('\n');
     gapBuff->Insert('\r');
+    dirtyFlag++;
     break;
   case KEYS::CODES::BACKSPACE:
     gapBuff->Backspace();
+    dirtyFlag++;
     break;
   default:
     gapBuff->Insert(ch);
+    dirtyFlag++;
     break;
   }
+}
+
+bool DocumentInterface::isDirtyState() const {
+  return dirtyFlag;
 }
 
 /*void DocumentInterface::OpenFileToBuffer(std::string fileName) {
   
   }*/
 
-void DocumentInterface::SaveBufferToFile() {
+void DocumentInterface::SaveBufferToFile(std::string fName) {
+  if(!fileHandler.is_open()) {
+    fileName = fName;
+    fileHandler.open(fName);
+    fileNameisSet = true;
+  }
   fileHandler<<gapBuff->printBuffer();
+  dirtyFlag = 0;
 }
 
+bool DocumentInterface::getFileNameisSet() const {
+  return fileNameisSet;
+}
 std::string DocumentInterface::printGapBuffer() {
   return gapBuff->printBuffer();
 }

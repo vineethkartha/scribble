@@ -3,10 +3,8 @@
 #include <termios.h>
 #include<iostream>
 #include <sys/ioctl.h>
+#include <assert.h>
 
-void VT100gui::CommandWriterHelper() {
-
-}
 VT100gui::VT100gui() {
   if (tcgetattr(STDIN_FILENO, &orig_termios) == -1)
     exitonException("tcgetattr");
@@ -17,6 +15,8 @@ VT100gui::VT100gui() {
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
   getWinSize();
+  currRow = 0;
+  currCol = 0;
 }
 
 VT100gui::~VT100gui() {
@@ -25,23 +25,22 @@ VT100gui::~VT100gui() {
 }
 
 void VT100gui::clearScreen() {
-  write(STDOUT_FILENO, "\x1b[2J", 4);
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  CommandWriterHelper("\x1b[2J\x1b[H");
 }
 
 void VT100gui::getWinSize() {
   struct winsize ws;
   if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+    assert(false);
     return;
   } else {
-    numOfRows = ws.ws_col;
-    numOfCols = ws.ws_row;
+    numOfCols = ws.ws_col;
+    numOfRows = ws.ws_row;
   }
 }
 
 void VT100gui::exitonException(const char *s) {
-  write(STDOUT_FILENO, "\x1b[2J", 4);
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  CommandWriterHelper("\x1b[2J\x1b[H");
   perror(s);
   exit(1);
 }
@@ -53,11 +52,9 @@ void VT100gui::editorDrawRows() {
   }
 }
 
-void VT100gui::editorRefreshScreen() {
-  char buf[10];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH",0,0);
-  //snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,currCol);
-  write(STDOUT_FILENO,buf,strlen(buf));
+void VT100gui::editorRefreshScreen(std::string fName, bool dirty) {
+  CommandWriterHelper("\x1b[K");
+  statusBar(fName, dirty);
 }
 
 
@@ -95,57 +92,48 @@ int VT100gui::VT100CommandProcess() {
     
   case KEYS::CODES::UP_ARROW:
     {
-      char buf[10];
       currRow--;
-      snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,currCol);
-      write(STDOUT_FILENO,buf,strlen(buf));
+      DrawCursor(currRow,currCol);
       return KEYS::CODES::UP_ARROW;
     }
 
   case KEYS::CODES::DOWN_ARROW:
     {
-      char buf[10];
       currRow++;
-      snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,currCol);
-      write(STDOUT_FILENO,buf,strlen(buf));
+      DrawCursor(currRow,currCol);
       return KEYS::CODES::DOWN_ARROW;
     }
 
   case KEYS::CODES::RIGHT_ARROW:
     {
-      char buf[10];
       currCol++;
-      snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,currCol);
-      write(STDOUT_FILENO,buf,strlen(buf));
+      DrawCursor(currRow,currCol);
       return KEYS::CODES::RIGHT_ARROW;
     }
   case KEYS::CODES::LEFT_ARROW:
     {
-      char buf[10];
       currCol--;
-      snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,currCol);
-      write(STDOUT_FILENO,buf,strlen(buf));
+      DrawCursor(currRow,currCol);
       return KEYS::CODES::LEFT_ARROW;
     }
   case '\r':
     {
-      char buf[15];
       currRow++;
-      snprintf(buf, sizeof(buf), "\x1b[%d;%dH",currRow,0);
-      write(STDOUT_FILENO,buf,strlen(buf));
+      currCol = 0;
+      DrawCursor(currRow,currCol);
       return '\r';
     }
   case KEYS::CODES::BACKSPACE:
-      currCol--;      
-      write(STDOUT_FILENO, "\x1b[J", 4);
-      write(STDOUT_FILENO, "\x1b[H", 3);
+      currCol--;
+      CommandWriterHelper("\x1b[J");
+      DrawCursor(currRow, currCol);
       return KEYS::CODES::BACKSPACE;
   default:
-    write(STDOUT_FILENO, "\x1b[1J", 4);
-    write(STDOUT_FILENO, "\x1b[H", 3);
+    currCol++;
+    CommandWriterHelper("\x1b[1J");
+    DrawCursor(currRow,currCol);
     return key;
   }
-  //  std::cout<<currRow<<":"<<currCol<<";";
 }
 
 int VT100gui::getCursorPosition() {
@@ -160,7 +148,6 @@ int VT100gui::getCursorPosition() {
   buf[i] = '\0';
   if (buf[0] != '\x1b' || buf[1] != '[') return -1;
   if (sscanf(&buf[2], "%d;%d", &currRow, &currCol) != 2) {
-    //    std::cout<<rows<<":"<<cols<<";";
     return -1;
   }
   return 0;
@@ -172,21 +159,77 @@ int VT100gui::getColumn() const {
   return currCol;
 }
 
-void VT100gui::statusBar(std::string ptr, int rows) {
+void VT100gui::statusBar(std::string fName, bool dirty) {
+  getWinSize();
+  // take cursor to the second last line of the screen
+  std::string cmd = "\x1b["+std::to_string(numOfRows-1)+";0H"; 
+  CommandWriterHelper(cmd);
+  CommandWriterHelper("\x1b[7m");
 
-  /*
-  char buf[15];
-  write(STDOUT_FILENO, ptr.c_str(),ptr.size());
-  write(STDOUT_FILENO, "\x1b[7m", 4);
+  int len = 0;
+  std::string statusMsg = fName;
+  if(dirty)
+    statusMsg = statusMsg + "* Line:" + std::to_string(currRow);
+  else
+    statusMsg = statusMsg + " Line:" + std::to_string(currRow);
+  CommandWriterHelper(statusMsg);
+  while (len < (numOfCols-statusMsg.length())) {
+    CommandWriterHelper(" ");
+    len++;
+  }
+  CommandWriterHelper("\x1b[m");
+  CommandWriterHelper("\x1b[0;0H");
+}
 
-  // rest of code here
-  char status[80];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH",rowSize,1);
-  write(STDOUT_FILENO,buf,strlen(buf));
-  snprintf(status, sizeof(status), "%.20s - %d lines",
-    "untitled", rows);
-  write(STDOUT_FILENO, status, 20);
-  write(STDOUT_FILENO, "\x1b[m", 3);
-  */
-  //  abAppend(ab, "\x1b[m", 3);
+std::string VT100gui::commandInputs() {
+  DrawCursor(numOfRows,0);
+  int cmdRows = numOfRows;
+  int cmdCol = 0;
+  char buf[1000];
+  int i = 0;
+  bool enter = 1;
+  while(enter) {
+    int  ch = ReadKey();
+    switch(ch) {
+    case KEYS::CODES::UP_ARROW:
+    case KEYS::CODES::DOWN_ARROW:
+    case KEYS::CODES::LEFT_ARROW: 
+    case KEYS::CODES::RIGHT_ARROW:
+    case KEYS::CODES::OPEN_DOC:
+    case KEYS::CODES::EXIT_TERM:
+    case '\r':
+      enter = 0;
+      buf[i] = '\0';
+      CommandWriterHelper("\x1b[K");
+      break;
+    case KEYS::CODES::BACKSPACE:
+    default:
+      buf[i++] = ch;
+      cmdCol++;
+      break;
+    }
+    editorRefreshScreen("Enter FileName", false);
+    DrawCursor(cmdRows , 0);
+    write(STDOUT_FILENO, buf,i);
+    DrawCursor(cmdRows , cmdCol);
+  }
+  editorRefreshScreen("Enter FileName", false);
+  DrawCursor(currRow,currCol);
+  return std::string(buf);
+}
+
+void VT100gui::writeContent(std::string content) {
+  write(STDOUT_FILENO, content.c_str(),content.size());
+  DrawCursor(currRow, currCol);
+}
+
+void VT100gui::CommandWriterHelper(const std::string command) {
+  char buf[32];
+  snprintf(buf, sizeof(buf), command.c_str(),0);
+  write(STDOUT_FILENO,command.c_str(),command.length());
+}
+
+void VT100gui::DrawCursor(int row, int column) {
+  std::string cmd = "\x1b[" + std::to_string(row) + ";" + std::to_string(column) + "H";
+  CommandWriterHelper(cmd);
 }

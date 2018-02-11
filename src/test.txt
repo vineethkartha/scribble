@@ -1,3 +1,0 @@
-This is a test modue.
-Look at how this file is read
-EO

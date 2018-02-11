@@ -24,20 +24,26 @@ class VT100gui {
   int currRow;
   int currCol;
   struct termios orig_termios;
+
+  void editorDrawRows();
   void getWinSize();
-  void CommandWriterHelper();
+  void exitonException(const char *s);
+  void CommandWriterHelper(const std::string command);
+  void statusBar(std::string fName, bool dirty);
+  int ReadKey();
+  int getCursorPosition();
+
 public:
   VT100gui();
   ~VT100gui();
-  void exitonException(const char *s);
-  void editorDrawRows();
   void clearScreen();
-  void editorRefreshScreen();
-  int ReadKey();
+  void editorRefreshScreen(std::string fName, bool dirty);
+  void writeContent(std::string content);
+  void DrawCursor(int row, int column);
+
   int VT100CommandProcess();
-  int getCursorPosition();
-  void statusBar(std::string, int rows);
   int getRow() const;
   int getColumn() const;
 
+  std::string commandInputs();
 };
