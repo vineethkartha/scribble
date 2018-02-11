@@ -200,7 +200,6 @@ std::string VT100gui::commandInputs() {
     case '\r':
       enter = 0;
       buf[i] = '\0';
-      CommandWriterHelper("\x1b[K");
       break;
     case KEYS::CODES::BACKSPACE:
     default:
@@ -213,6 +212,8 @@ std::string VT100gui::commandInputs() {
     write(STDOUT_FILENO, buf,i);
     DrawCursor(cmdRows , cmdCol);
   }
+  // erase the whole line after enter has been pressed
+  CommandWriterHelper("\x1b[2K");
   editorRefreshScreen("Enter FileName", false);
   DrawCursor(currRow,currCol);
   return std::string(buf);
