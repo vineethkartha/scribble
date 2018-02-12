@@ -1,18 +1,18 @@
 #include <fstream>
 
-class GapBuffer;
+class DataStructureInterface;
 
 class DocumentInterface {
   std::fstream fileHandler;
   std::string fileName = "untitled";
   int dirtyFlag;
   bool fileNameisSet;
-  GapBuffer *gapBuff;
+  DataStructureInterface *gapBuff;
 
 public:
   static int fileCounter;
   DocumentInterface(); // make sure this opens as untitledxx
-  DocumentInterface(std::string fileName); // make sure this opens as untitledxx
+  DocumentInterface(std::string fileName); // make sure this opens with the specified file
 
   ~DocumentInterface();
   

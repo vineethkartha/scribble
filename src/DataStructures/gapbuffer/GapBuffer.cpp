@@ -17,7 +17,12 @@ GapBuffer::GapBuffer(int gapSize) {
 }
 
 GapBuffer::~GapBuffer() {
-  delete(this->buffer);
+  delete(this->buffer); 
+  bufferStart = nullptr;
+  bufferEnd = nullptr;
+  gapStart = nullptr;
+  gapEnd = nullptr;
+  cursorPos = nullptr;
 }
 
 void GapBuffer::ResizeBuffer() {
@@ -37,7 +42,7 @@ void GapBuffer::ResizeBuffer() {
   this->gapStart = this->bufferStart + origSize;
   this->gapEnd = this->bufferEnd;
   this->gapSize = size;
-  this->MoveGap(cursorPos);
+  this->MoveCursor(cursorPos);
 }
 
 /**
@@ -106,7 +111,7 @@ void GapBuffer::Backspace() {
   this->insertCounter -=1;
 }
 
-void GapBuffer::MoveGap(int pos) {
+void GapBuffer::MoveCursor(int pos) {
   auto pointer = this->bufferStart + pos;
   // If the pointer is between the current position and
   // the gap end we should not move.
@@ -143,7 +148,7 @@ void GapBuffer::MoveGap(int pos) {
  * This function returns the contents of the entire buffer as a string
  * It ignores the gap in between.
  */
-std::string GapBuffer::printBuffer() {
+std::string GapBuffer::getContentOfBuffer() const{
   std::string buff;
   for(auto ptr = this->bufferStart; ptr <= this->bufferEnd; ++ptr) {
     // Skip the gap this should be empty.

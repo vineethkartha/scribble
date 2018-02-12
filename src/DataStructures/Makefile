@@ -1,14 +1,12 @@
-Includes = -I ./include 
+Includes = -I ./include -I ./gapbuffer/include
 CXX = g++
 CFLAGS = -std=c++11 -g
 
 TestFiles = ./tests/unittest.cpp
 # Libs=#whatever libraries you need to provide to g++
+DataStructureInterface.o: DataStructureInterface.cpp
+	$(CXX) $(CFLAGS) $(Includes) -c -o ../DataStructureInterface.o  DataStructureInterface.cpp
 
-GapBuffer.o:GapBuffer.cpp
-	$(CXX) $(CFLAGS) $(Includes) -c -o ../../GapBuffer.o GapBuffer.cpp
-#	$(MAKE) buildtests		
-#	$(MAKE) runtest
 clean:
 	rm *.o *.log
 buildtests:$(TestFiles)

@@ -1,15 +1,13 @@
 #include<iostream>
-#include "DataStructures/gapbuffer/include/GapBuffer.hpp"
+//#include "DataStructures/include/DataStructureInterface.hpp"
 #include "DocumentInterface/include/DocumentInterface.hpp"
 #include "GUI/vt100/include/vt100terminal.hpp"
 #include <string.h>
 #include <fstream>
 
 int main() {
-  GapBuffer gp(20);
-  //DocumentInterface dp("test.txt");
+
   DocumentInterface *dp;
-  //DocumentInterface *diOpen;
   VT100gui gui;
   int ch=0;
   bool cmdFlag = 0;

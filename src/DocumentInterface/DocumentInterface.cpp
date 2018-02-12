@@ -1,5 +1,6 @@
 #include "include/DocumentInterface.hpp"
-#include "DataStructures/gapbuffer/include/GapBuffer.hpp"
+#include "DataStructures/include/DataStructureInterface.hpp"
+//#include "gapbuffer/include/GapBuffer.hpp"
 #include <iostream>
 #include "GUI/vt100/include/vt100terminal.hpp"
 
@@ -9,13 +10,13 @@ DocumentInterface::DocumentInterface() {
   fileName = "";
   fileCounter += 1;
   fileNameisSet = false;
-  gapBuff = new GapBuffer(100);
+  gapBuff = DataStructureInterface::CreateDS(1);
   dirtyFlag = 0;
 }
 
 DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
   fileHandler.open(fileName, std::fstream::in | std::fstream::out | std::fstream::app);
-  gapBuff = new GapBuffer(100);
+  gapBuff = DataStructureInterface::CreateDS(1);
   char c;
   while(fileHandler.get(c)) {
     if(c=='\n') {
@@ -28,6 +29,12 @@ DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
   fileNameisSet = true;
 }
 
+DocumentInterface::~DocumentInterface() {
+  fileCounter = fileCounter?fileCounter -= 1:0;
+  fileHandler.close(); 
+  delete gapBuff;
+}
+
 std::string DocumentInterface::getFileName() const {
   if(fileName == "") {
     return("untitled" + std::to_string(fileCounter) + ".txt");
@@ -35,15 +42,17 @@ std::string DocumentInterface::getFileName() const {
   return fileName;
 }
 
-DocumentInterface::~DocumentInterface() {
-  fileCounter = fileCounter?fileCounter -= 1:0;
-  fileHandler.close(); 
-  delete gapBuff;
+bool DocumentInterface::isDirtyState() const {
+  return dirtyFlag;
+}
+
+bool DocumentInterface::getFileNameisSet() const {
+  return fileNameisSet;
 }
 
 void DocumentInterface::NavigateBuffer(int cols, int rows) {
   //currently this implements only the left key
-  gapBuff->MoveGap(cols);
+  gapBuff->MoveCursor(cols);
 }
 
 void DocumentInterface::UpdateBuffer(int ch) {
@@ -64,23 +73,16 @@ void DocumentInterface::UpdateBuffer(int ch) {
   }
 }
 
-bool DocumentInterface::isDirtyState() const {
-  return dirtyFlag;
-}
-
 void DocumentInterface::SaveBufferToFile(std::string fName) {
   if(!fileHandler.is_open()) {
     fileName = fName;
     fileHandler.open(fName, std::fstream::in | std::fstream::out | std::fstream::app);
     fileNameisSet = true;
   }
-  fileHandler<<gapBuff->printBuffer();
+  fileHandler<<gapBuff->getContentOfBuffer();
   dirtyFlag = 0;
 }
 
-bool DocumentInterface::getFileNameisSet() const {
-  return fileNameisSet;
-}
 std::string DocumentInterface::printGapBuffer() {
-  return gapBuff->printBuffer();
+  return gapBuff->getContentOfBuffer();
 }
