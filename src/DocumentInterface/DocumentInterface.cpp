@@ -1,7 +1,7 @@
 #include "include/DocumentInterface.hpp"
-#include "DataStructures/gapbuffer/include/GapBuffer.hpp"
+#include "DataStructures/include/DataStructureInterface.hpp"
 #include <iostream>
-#include "GUI/vt100/include/vt100terminal.hpp"
+//#include "GUI/vt100/include/vt100terminal.hpp"
 
 int DocumentInterface::fileCounter = 0;
 
@@ -9,22 +9,29 @@ DocumentInterface::DocumentInterface() {
   fileName = "";
   fileCounter += 1;
   fileNameisSet = false;
-  gapBuff = new GapBuffer(100);
+  contentBuffer = DataStructureInterface::CreateDS(1);
   dirtyFlag = 0;
 }
 
 DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
-  /*  fileHandler.open(fileName);
-  gapBuff = new GapBuffer(100);
+  fileHandler.open(fileName, std::fstream::in | std::fstream::out | std::fstream::app);
+  contentBuffer = DataStructureInterface::CreateDS(1);
   char c;
   while(fileHandler.get(c)) {
     if(c=='\n') {
-      gapBuff->Insert('\r');
-      gapBuff->Insert('\n');
+      contentBuffer->Insert('\r');
+      contentBuffer->Insert('\n');
     } else {
-      gapBuff->Insert(c);
+      contentBuffer->Insert(c);
     }
-    }*/
+  }
+  fileNameisSet = true;
+}
+
+DocumentInterface::~DocumentInterface() {
+  fileCounter = fileCounter?fileCounter -= 1:0;
+  fileHandler.close();
+  delete contentBuffer;
 }
 
 std::string DocumentInterface::getFileName() const {
@@ -34,56 +41,47 @@ std::string DocumentInterface::getFileName() const {
   return fileName;
 }
 
-DocumentInterface::~DocumentInterface() {
-  fileCounter = fileCounter?fileCounter -= 1:0;
-  fileHandler.close(); 
-  delete gapBuff;
-}
-
-void DocumentInterface::NavigateBuffer(int cols, int rows) {
-  //currently this implements only the left key
-  gapBuff->MoveGap(cols);
-}
-
-void DocumentInterface::UpdateBuffer(int ch) {
-  switch(ch) {
-  case '\r':
-    gapBuff->Insert('\n');
-    gapBuff->Insert('\r');
-    dirtyFlag++;
-    break;
-  case KEYS::CODES::BACKSPACE:
-    gapBuff->Backspace();
-    dirtyFlag++;
-    break;
-  default:
-    gapBuff->Insert(ch);
-    dirtyFlag++;
-    break;
-  }
-}
-
 bool DocumentInterface::isDirtyState() const {
   return dirtyFlag;
-}
-
-/*void DocumentInterface::OpenFileToBuffer(std::string fileName) {
-  
-  }*/
-
-void DocumentInterface::SaveBufferToFile(std::string fName) {
-  if(!fileHandler.is_open()) {
-    fileName = fName;
-    fileHandler.open(fName);
-    fileNameisSet = true;
-  }
-  fileHandler<<gapBuff->printBuffer();
-  dirtyFlag = 0;
 }
 
 bool DocumentInterface::getFileNameisSet() const {
   return fileNameisSet;
 }
+
+void DocumentInterface::NavigateBuffer(int cols, int rows) {
+  //currently this implements only the left key
+  contentBuffer->MoveCursor(cols);
+}
+
+void DocumentInterface::UpdateBuffer(int ch) {
+  switch(ch) {
+  case '\r':
+    contentBuffer->Insert('\n');
+    contentBuffer->Insert('\r');
+    dirtyFlag++;
+    break;
+  default:
+    contentBuffer->Insert(ch);
+    dirtyFlag++;
+    break;
+  }
+}
+
+void DocumentInterface::BackSpaceBuffer() {
+  contentBuffer->Backspace();
+  dirtyFlag++;
+}
+void DocumentInterface::SaveBufferToFile(std::string fName) {
+  if(!fileHandler.is_open()) {
+    fileName = fName;
+    fileHandler.open(fName, std::fstream::in | std::fstream::out | std::fstream::app);
+    fileNameisSet = true;
+  }
+  fileHandler<<contentBuffer->getContentOfBuffer();
+  dirtyFlag = 0;
+}
+
 std::string DocumentInterface::printGapBuffer() {
-  return gapBuff->printBuffer();
+  return contentBuffer->getContentOfBuffer();
 }

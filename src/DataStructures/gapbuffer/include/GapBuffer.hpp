@@ -1,3 +1,4 @@
+#include "../../include/DataStructureInterface.hpp"
 #include <string>
 /*
 Initialise the gap buffer with a given size
@@ -28,7 +29,7 @@ GapEnd = gapStart+ (gapSize-insertCounter)
  * is the base data structure used by scribble
  * This class implements the data structure.
  */
-class GapBuffer {
+class GapBuffer:public DataStructureInterface {
   
   unsigned int gapSize;
   unsigned int insertCounter = 0;
@@ -52,41 +53,41 @@ public:
    * It resizes the buffer and inserts the character.
    * @param symbol
    */
-  void Insert(char symbol);
+  void Insert(char symbol) override;
 
   /**
    * @name Delete
    * @brief This function deletes the character at the current position.
    */
-  void Delete();
+  void Delete() override;
 
   /**
    * @name Backspace
    * @brief This function deletes the character previous to the current position.
    */
-  void Backspace();
+  void Backspace() override;
   
   /**
-   * @name MoveGap
+   * @name MoveCursor
    * @brief This function moves the gap to wherever position mentioned.
    * Based on the paramter pos, the gap is moved either forward
    * or backward in the buffer. 
    * @param int pos
    */
-  void MoveGap(int pos);
+  void MoveCursor(int pos) override;
   
   /**
    * @name ResizeBuffer
    * @brief When the buffer runs ou of space this function increases the buffer size.
    */
-  void ResizeBuffer();
+  void ResizeBuffer() override;
   
   /**
-   * @name printBuffer
+   * @name getContentOfBuffer
    * @brief This function returns the contents of the buffer.
    * @return std::string
    */
-  std::string printBuffer();
+  std::string getContentOfBuffer() const override;
   
   void Debugprint();
 };

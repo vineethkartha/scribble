@@ -1,18 +1,19 @@
 #include <fstream>
-
-class GapBuffer;
+#include <memory>
+class DataStructureInterface;
 
 class DocumentInterface {
-  std::ofstream fileHandler;
+  std::fstream fileHandler;
   std::string fileName = "untitled";
   int dirtyFlag;
-  bool fileNameisSet;
-  GapBuffer *gapBuff;
+  bool fileNameisSet; 
+  // make this unique ptr
+  DataStructureInterface *contentBuffer;
 
 public:
   static int fileCounter;
   DocumentInterface(); // make sure this opens as untitledxx
-  DocumentInterface(std::string fileName); // make sure this opens as untitledxx
+  DocumentInterface(std::string fileName); // make sure this opens with the specified file
 
   ~DocumentInterface();
   
@@ -22,7 +23,7 @@ public:
   
   void NavigateBuffer(int cols, int rows);
   void SaveBufferToFile(std::string fName = "");
-  void OpenFileToBuffer();
   void UpdateBuffer(int ch);
+  void BackSpaceBuffer();
   std::string printGapBuffer();
 };
