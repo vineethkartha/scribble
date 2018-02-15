@@ -53,19 +53,19 @@ public:
    * It resizes the buffer and inserts the character.
    * @param symbol
    */
-  void Insert(char symbol);
+  void Insert(char symbol) override;
 
   /**
    * @name Delete
    * @brief This function deletes the character at the current position.
    */
-  void Delete();
+  void Delete() override;
 
   /**
    * @name Backspace
    * @brief This function deletes the character previous to the current position.
    */
-  void Backspace();
+  void Backspace() override;
   
   /**
    * @name MoveCursor
@@ -74,20 +74,20 @@ public:
    * or backward in the buffer. 
    * @param int pos
    */
-  void MoveCursor(int pos);
+  void MoveCursor(int pos) override;
   
   /**
    * @name ResizeBuffer
    * @brief When the buffer runs ou of space this function increases the buffer size.
    */
-  void ResizeBuffer();
+  void ResizeBuffer() override;
   
   /**
    * @name getContentOfBuffer
    * @brief This function returns the contents of the buffer.
    * @return std::string
    */
-  std::string getContentOfBuffer() const;
+  std::string getContentOfBuffer() const override;
   
   void Debugprint();
 };

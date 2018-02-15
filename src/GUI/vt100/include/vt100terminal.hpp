@@ -27,6 +27,7 @@ class VT100gui {
 
   void editorDrawRows();
   void getWinSize();
+  void DetectWinBoundary(bool forWard, bool downWard);
   void exitonException(const char *s);
   void CommandWriterHelper(const std::string command);
   void statusBar(std::string fName, bool dirty);

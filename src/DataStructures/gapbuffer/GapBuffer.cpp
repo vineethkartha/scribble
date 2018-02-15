@@ -108,7 +108,7 @@ void GapBuffer::Backspace() {
   this->cursorPos--;
   *(this->cursorPos) = '\0';
   this->gapStart--;
-  this->insertCounter -=1;
+  this->insertCounter -= 1;
 }
 
 void GapBuffer::MoveCursor(int pos) {
@@ -118,29 +118,33 @@ void GapBuffer::MoveCursor(int pos) {
   if(pointer < this->bufferStart ||
      pointer > this->bufferEnd)
     return;
-  bool NeedtoMove = !(pointer >= this->cursorPos
-		      && pointer <= this->gapEnd + 1);
+  bool modifyPos = (pointer >= this->cursorPos
+		     && pointer <= this->gapEnd + 1);
   bool MoveForward = (pointer > this->cursorPos);
 
-  if(NeedtoMove) {
-    if(MoveForward) {
-      int sizetoMove = pointer - this->gapEnd;
-      auto pointerToMove = this->gapEnd;
-      std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
-      this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
-    } else {
-      int sizetoMove = this->cursorPos - pointer;
-      auto pointerToMove = this->gapEnd - sizetoMove;
-      std::copy(pointer, pointer + (sizetoMove), pointerToMove);
-      this->cursorPos = pointer;
-    }
-    this->gapStart =this->cursorPos;
-    this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
-    // Clear the gap 
-    for(auto p = this->gapStart; p < this->gapEnd; ++p)
-      *p ='\0';
-    *(this->bufferEnd) = '\0';
+  if(modifyPos && MoveForward) {
+    pointer  = (this->gapEnd - this->cursorPos) + this->cursorPos + 1;
   }
+  //if(NeedtoMove)
+    {
+      if(MoveForward) {
+	int sizetoMove = pointer - this->gapEnd;
+	auto pointerToMove = this->gapEnd;
+	std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
+	this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
+      } else {
+	int sizetoMove = this->cursorPos - pointer;
+	auto pointerToMove = this->gapEnd - sizetoMove;
+	std::copy(pointer, pointer + (sizetoMove), pointerToMove);
+	this->cursorPos = pointer;
+      }
+      this->gapStart =this->cursorPos;
+      this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
+      // Clear the gap 
+      for(auto p = this->gapStart; p < this->gapEnd; ++p)
+	*p ='\0';
+      *(this->bufferEnd) = '\0';
+    }
 }
 
 /**

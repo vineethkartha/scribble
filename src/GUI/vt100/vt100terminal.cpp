@@ -24,6 +24,7 @@ VT100gui::~VT100gui() {
     exitonException("tcsetattr");
 }
 
+
 void VT100gui::clearScreen() {
   CommandWriterHelper("\x1b[2J\x1b[H");
 }
@@ -106,13 +107,24 @@ int VT100gui::VT100CommandProcess() {
 
   case KEYS::CODES::RIGHT_ARROW:
     {
-      currCol++;
+      if(currCol < numOfCols) {
+	currCol++;
+      } else {
+	currCol = 0;
+	currRow++;
+      }
       DrawCursor(currRow,currCol);
       return KEYS::CODES::RIGHT_ARROW;
     }
   case KEYS::CODES::LEFT_ARROW:
     {
-      currCol--;
+      if(currCol > 1) {
+	currCol--;
+      } else if(currRow > 1) {
+	currRow--;
+	currCol = numOfCols;
+      }
+      //DetectWinBoundary(false, false);
       DrawCursor(currRow,currCol);
       return KEYS::CODES::LEFT_ARROW;
     }
@@ -124,12 +136,24 @@ int VT100gui::VT100CommandProcess() {
       return '\r';
     }
   case KEYS::CODES::BACKSPACE:
+    if(currCol > 1) {
       currCol--;
-      CommandWriterHelper("\x1b[J");
-      DrawCursor(currRow, currCol);
-      return KEYS::CODES::BACKSPACE;
+    } else if(currRow > 1) {
+      currRow--;
+      currCol = numOfCols;
+    }
+    //DetectWinBoundary(false, false);
+    CommandWriterHelper("\x1b[J");
+    DrawCursor(currRow, currCol);
+    return KEYS::CODES::BACKSPACE;
   default:
-    currCol++;
+    //DetectWinBoundary(true, true);
+    if(currCol < numOfCols) {
+      currCol++;
+    } else {
+      currCol = 0;
+      currRow++;
+    }
     CommandWriterHelper("\x1b[1J");
     DrawCursor(currRow,currCol);
     return key;
@@ -204,7 +228,6 @@ std::string VT100gui::commandInputs() {
     case KEYS::CODES::BACKSPACE:
       cmdCol--;
       buf[--i]='\0';
-      //      i--;
       break;
     default:
       buf[i++] = ch;
@@ -237,4 +260,22 @@ void VT100gui::CommandWriterHelper(const std::string command) {
 void VT100gui::DrawCursor(int row, int column) {
   std::string cmd = "\x1b[" + std::to_string(row) + ";" + std::to_string(column) + "H";
   CommandWriterHelper(cmd);
+}
+
+//XXX needs more work here
+void VT100gui::DetectWinBoundary(bool forWard, bool downWard) {
+  if(!forWard) {
+    if(currCol > 1) {
+      currCol--;
+    } else if(currRow > 1) {
+      currRow--;
+      currCol = numOfCols;
+    }
+    if(currCol > numOfCols) {
+      currCol = 0;
+      currRow++;
+    }
+  }
+  else
+    currCol++;
 }

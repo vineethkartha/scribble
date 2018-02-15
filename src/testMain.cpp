@@ -1,5 +1,4 @@
 #include<iostream>
-//#include "DataStructures/include/DataStructureInterface.hpp"
 #include "DocumentInterface/include/DocumentInterface.hpp"
 #include "GUI/vt100/include/vt100terminal.hpp"
 #include <string.h>
@@ -24,7 +23,7 @@ int main() {
     case KEYS::CODES::DOWN_ARROW:
     case KEYS::CODES::LEFT_ARROW: 
     case KEYS::CODES::RIGHT_ARROW:
-      dp->NavigateBuffer(gui.getColumn(),gui.getRow());
+      dp->NavigateBuffer(gui.getColumn()-1,gui.getRow()-1);
       break;
     case KEYS::CODES::OPEN_DOC:
       delete dp;
@@ -44,9 +43,12 @@ int main() {
       
       gui.DrawCursor(gui.getRow(), gui.getColumn());
       break;
+    
+    case KEYS::CODES::BACKSPACE:
+      dp->BackSpaceBuffer();
+      break;
     case '\r':
       cmdFlag = 0;
-    case KEYS::CODES::BACKSPACE:
     default:
       cmdFlag = 0;
       dp->UpdateBuffer(ch);

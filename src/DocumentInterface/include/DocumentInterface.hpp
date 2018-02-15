@@ -1,13 +1,14 @@
 #include <fstream>
-
+#include <memory>
 class DataStructureInterface;
 
 class DocumentInterface {
   std::fstream fileHandler;
   std::string fileName = "untitled";
   int dirtyFlag;
-  bool fileNameisSet;
-  DataStructureInterface *gapBuff;
+  bool fileNameisSet; 
+  // make this unique ptr
+  DataStructureInterface *contentBuffer;
 
 public:
   static int fileCounter;
@@ -23,5 +24,6 @@ public:
   void NavigateBuffer(int cols, int rows);
   void SaveBufferToFile(std::string fName = "");
   void UpdateBuffer(int ch);
+  void BackSpaceBuffer();
   std::string printGapBuffer();
 };
