@@ -135,6 +135,14 @@ int VT100gui::VT100CommandProcess() {
       DrawCursor(currRow,currCol);
       return '\r';
     }
+  case '\t':
+    {
+      currCol+=5;
+      currCol++;
+      //currCol = 0;
+      DrawCursor(currRow,currCol);
+      return '\t';
+    }
   case KEYS::CODES::BACKSPACE:
     if(currCol > 1) {
       currCol--;

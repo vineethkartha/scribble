@@ -1,0 +1,9 @@
+* DONE After entering file name it does not get displayed immediately
+* DONE Remove the special characters.from the file.
+* TODO Incremental save.
+* TODO The arrow keys should not navigate beyond text entered
+* TODO Test what happens when the boundaries are violated.
+* TODO when creating a file check if already exists
+* TODO Fix the tabs
+* TODO When opening a new file bring cursor to the end of content
+* TODO Implement movement across line 

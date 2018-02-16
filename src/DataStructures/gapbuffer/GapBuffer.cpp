@@ -154,17 +154,16 @@ void GapBuffer::MoveCursor(int pos) {
  */
 std::string GapBuffer::getContentOfBuffer() const{
   std::string buff;
-  for(auto ptr = this->bufferStart; ptr <= this->bufferEnd; ++ptr) {
+  for(auto ptr = this->bufferStart; ptr < this->bufferEnd; ++ptr) {
     // Skip the gap this should be empty.
     if(ptr >= this->gapStart &&
-       ptr < this->gapEnd) {
+       ptr <= this->gapEnd) {
       // xxx TODO check why this assertion fails.
-      //assert(*ptr == '\0');
+      assert(*ptr == '\0');
       continue;
     }
     buff += *ptr;
   }
-  buff += '\0';
   return buff;
 }
 

@@ -40,7 +40,7 @@ int main() {
       } else {
 	dp->SaveBufferToFile();
       }
-      
+      gui.editorRefreshScreen(dp->getFileName(), false);
       gui.DrawCursor(gui.getRow(), gui.getColumn());
       break;
     
