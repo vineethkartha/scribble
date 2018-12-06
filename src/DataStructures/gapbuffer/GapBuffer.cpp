@@ -157,8 +157,7 @@ std::string GapBuffer::getContentOfBuffer() const{
   for(auto ptr = this->bufferStart; ptr < this->bufferEnd; ++ptr) {
     // Skip the gap this should be empty.
     if(ptr >= this->gapStart &&
-       ptr <= this->gapEnd) {
-      // xxx TODO check why this assertion fails.
+       ptr < this->gapEnd) {
       assert(*ptr == '\0');
       continue;
     }
