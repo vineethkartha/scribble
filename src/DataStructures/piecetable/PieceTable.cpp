@@ -87,13 +87,3 @@ void PieceTable::displayText() const{
   }
 }
  
-
-
-int main() {
-  PieceTable pt("Hello sample text\n");
-  pt.add("this is ",6);
-  pt.add("some ",14);
-  pt.displayTable();
-  pt.displayText();
-  return 0;
-}

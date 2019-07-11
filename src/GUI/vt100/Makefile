@@ -1,6 +1,6 @@
 Includes = ./includes
 CXX = g++
-CFLAGS = -std=c++11 -g
+CFLAGS = -std=c++1y -g
 
 
 #TestFiles = ./tests/unittest.cpp

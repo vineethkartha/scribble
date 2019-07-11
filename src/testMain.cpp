@@ -3,7 +3,17 @@
 #include "GUI/vt100/include/vt100terminal.hpp"
 #include <string.h>
 #include <fstream>
+#include "DataStructures/piecetable/include/PieceTable.hpp"
+int main() {
+    PieceTable pt("Hello sample text\n");
+  pt.add("this is ",6);
+  pt.add("some ",14);
+  pt.displayTable();
+  pt.displayText();
 
+  return 0;
+}
+/*
 int main() {
 
   DocumentInterface *dp;
@@ -64,3 +74,4 @@ int main() {
   delete dp;
   return 0;
 }
+*/
