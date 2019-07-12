@@ -32,6 +32,19 @@ void PieceTable::add(std::string text, uint splitPoint) {
   AddBuf += text;
 }
 
+
+/*
+  For deleting we have three possibilities
+  1. Either an entire piece can be deleted
+     This can happen if the start and end coincide with the start and end of a piece
+     Then delete that entry from the piece table
+  2. the deleted portion is a subset of a piece
+     In this case split the piece into two pieces
+  3. Deleted portion spans across multiple pieces
+     In this scenario split the truncate the start and end pieces and delete everything in between
+ */
+
+
 void PieceTable::del(uint start, uint end) {
   auto length = end - start;
   if(table.empty() || length == 0) {
@@ -40,6 +53,15 @@ void PieceTable::del(uint start, uint end) {
 
   auto itr1 = table.end();
   auto itr2 = table.end();
+
+  auto PieceContainsStart = [&start](Piece p) {
+      if(p.containsPoint(start)) {
+          return true;
+      }
+      start = start - p.getLength();
+      return false;
+  };
+
   
   for(auto itr = table.begin(); itr != table.end(); ++itr) {
     if(itr1 == table.end()) {
@@ -55,19 +77,20 @@ void PieceTable::del(uint start, uint end) {
       }else{
 	end -= itr->getLength();
       }
-    }
-    
+    } 
   }
-  auto PieceContainsPoint = [&start](Piece p) {
-      if(p.containsPoint(start)) {
-	return true;
-      }
-      start = start - p.getLength();
-      return false;
-  };
 
-  auto itr = std::find_if(table.begin(), table.end(),PieceContainsPoint);
-  
+  // case 1
+  if(itr1->getStart() == start && itr1->getLength() == end - start) {
+      table.erase(itr1);
+      //return;
+  }
+  // case 2
+  else {
+      
+  }
+
+  // case 3
 }
 
 void PieceTable::displayTable() const{
@@ -75,6 +98,7 @@ void PieceTable::displayTable() const{
   for(const auto& pt: this->table) {
     std::cout<<static_cast<std::underlying_type<Buffer>::type>(pt.getBuffName())<<"\t "<<pt.getStart()<<"\t "<<pt.getLength()<<"\n";
   }
+  std::cout<<OrigBuf<<"\n"<<AddBuf;
 }
 
 void PieceTable::displayText() const{

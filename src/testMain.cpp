@@ -6,12 +6,17 @@
 #include "DataStructures/piecetable/include/PieceTable.hpp"
 int main() {
     PieceTable pt("Hello sample text\n");
-  pt.add("this is ",6);
-  pt.add("some ",14);
-  pt.displayTable();
-  pt.displayText();
+    pt.displayTable();
+    std::cout<<"\n\n";
+    pt.add("this is ", 6);
+    pt.displayTable();
+    std::cout<<"\n\n";
+    pt.add("some ", 14);
+    pt.displayTable();
+    std::cout<<"\n\n";
+    pt.displayText();
 
-  return 0;
+    return 0;
 }
 /*
 int main() {
