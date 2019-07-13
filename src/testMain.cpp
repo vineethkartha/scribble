@@ -7,13 +7,15 @@
 int main() {
     PieceTable pt("Hello sample text\n");
     pt.displayTable();
-    std::cout<<"\n\n";
+    
     pt.add("this is ", 6);
     pt.displayTable();
-    std::cout<<"\n\n";
+    
     pt.add("some ", 14);
     pt.displayTable();
-    std::cout<<"\n\n";
+
+    pt.del(3,6);
+    pt.displayTable();
     pt.displayText();
 
     return 0;

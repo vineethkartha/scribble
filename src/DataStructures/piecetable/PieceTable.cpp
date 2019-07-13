@@ -7,7 +7,7 @@ void PieceTable::add(std::string text, uint splitPoint) {
     Piece p(Buffer::Add, 0, text.length());
     table.push_back(p);
   } else {
-    auto PieceContainsPoint = [&splitPoint](Piece p) {
+    auto PieceContainsPoint = [&splitPoint](const auto &p) {
       if(p.containsPoint(splitPoint)) {
 	return true;
       }
@@ -18,14 +18,11 @@ void PieceTable::add(std::string text, uint splitPoint) {
     auto itr = std::find_if(table.begin(), table.end(),PieceContainsPoint);
     
     if(itr->getStart() != splitPoint) {
-      Piece p1(itr->getBuffName(),itr->getStart(),splitPoint);
-      table.insert(itr,p1);
+      table.emplace(itr,itr->getBuffName(),itr->getStart(),splitPoint);
     }
-    Piece p2(Buffer::Add,AddBuf.length(),text.length());
-    table.insert(itr,p2);
+    table.emplace(itr,Buffer::Add,AddBuf.length(),text.length());
     if((itr->getLength() - splitPoint) != 0) {
-      Piece p3(itr->getBuffName(),splitPoint,(itr->getLength() - splitPoint));
-      table.insert(itr,p3);
+      table.emplace(itr,itr->getBuffName(),splitPoint,(itr->getLength() - splitPoint));
     }
     table.erase(itr);
   }
@@ -53,15 +50,6 @@ void PieceTable::del(uint start, uint end) {
 
   auto itr1 = table.end();
   auto itr2 = table.end();
-
-  auto PieceContainsStart = [&start](Piece p) {
-      if(p.containsPoint(start)) {
-          return true;
-      }
-      start = start - p.getLength();
-      return false;
-  };
-
   
   for(auto itr = table.begin(); itr != table.end(); ++itr) {
     if(itr1 == table.end()) {
@@ -86,8 +74,15 @@ void PieceTable::del(uint start, uint end) {
       //return;
   }
   // case 2
-  else {
-      
+  else if(itr1 == itr2){
+    if(itr1->getStart() != start) {
+      table.emplace(itr1,itr1->getBuffName(),itr1->getStart(),start -itr1->getStart());
+    }
+    if((itr1->getLength() - end) != 0) {
+      table.emplace(itr1,itr1->getBuffName(),end,itr1->getLength() - end);
+    }
+    table.erase(itr1);
+    itr2 = table.end();
   }
 
   // case 3
@@ -99,6 +94,7 @@ void PieceTable::displayTable() const{
     std::cout<<static_cast<std::underlying_type<Buffer>::type>(pt.getBuffName())<<"\t "<<pt.getStart()<<"\t "<<pt.getLength()<<"\n";
   }
   std::cout<<OrigBuf<<"\n"<<AddBuf;
+  std::cout<<"\n-----------------------------------\n";
 }
 
 void PieceTable::displayText() const{
