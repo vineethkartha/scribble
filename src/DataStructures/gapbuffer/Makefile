@@ -7,8 +7,8 @@ TestFiles = ./tests/unittest.cpp
 
 GapBuffer.o:GapBuffer.cpp
 	$(CXX) $(CFLAGS) $(Includes) -c -o ../../GapBuffer.o GapBuffer.cpp
-#	$(MAKE) buildtests		
-#	$(MAKE) runtest
+	$(MAKE) buildtests		
+	$(MAKE) runtest
 clean:
 	rm *.o *.log
 buildtests:$(TestFiles)

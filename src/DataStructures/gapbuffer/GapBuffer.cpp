@@ -13,7 +13,7 @@ GapBuffer::GapBuffer(int gapSize) {
   this->gapEnd = this->gapStart + this->gapSize;
   this->bufferEnd = this->bufferStart + this->gapSize;
   for(auto p = this->bufferStart; p <= this->bufferEnd; ++p)
-      *p ='\0';
+    *p ='\0';
 }
 
 GapBuffer::~GapBuffer() {
@@ -46,17 +46,17 @@ void GapBuffer::ResizeBuffer() {
 }
 
 /**
-   * @name Insert
-   * This function inserts the symbol passed
-   * and increments the gapStart and the cursorPos pointer.
-   * Consider the text shown below with 4 blank spaces:
-   * This is a gap buffer [----]
-   *  			        ^
-   * on inserting the character 'i'
-   * The buffer will be as shown below:
-   * This is a gap buffer i[---]
-   *  			        ^			      
-   */
+ * @name Insert
+ * This function inserts the symbol passed
+ * and increments the gapStart and the cursorPos pointer.
+ * Consider the text shown below with 4 blank spaces:
+ * This is a gap buffer [----]
+ *  			        ^
+ * on inserting the character 'i'
+ * The buffer will be as shown below:
+ * This is a gap buffer i[---]
+ *  			        ^			      
+ */
 void GapBuffer::Insert(char symbol) {
   this->ResizeBuffer();
   *(this->cursorPos) = symbol;
@@ -68,17 +68,17 @@ void GapBuffer::Insert(char symbol) {
 }
 
 /**
-   * @name Delete
-   * This function deletes the character under the cursor
-   * and increments the gapEnd pointer.
-   * Consider the text shown below with the cursor under d:
-   * This is a gap buffer [--]delete
-   *  			      ^
-   * The gap has 2 spaces left. After the delete operatio
-   * The buffer will be as shown below:
-   * This is a gap buffer [---]elete
-   *  			     ^			      
-   */
+ * @name Delete
+ * This function deletes the character under the cursor
+ * and increments the gapEnd pointer.
+ * Consider the text shown below with the cursor under d:
+ * This is a gap buffer [--]delete
+ *  			      ^
+ * The gap has 2 spaces left. After the delete operatio
+ * The buffer will be as shown below:
+ * This is a gap buffer [---]elete
+ *  			     ^			      
+ */
 void GapBuffer::Delete() {
   if(this->gapEnd == this->bufferEnd)
     return;
@@ -87,21 +87,21 @@ void GapBuffer::Delete() {
 }
 
 /**
-   * @name Backspace
-   * This function deletes the character under the before
-   * the cursor and decrements the gapStart pointer and
-   * the cursorPos pointer.
-   * Consider the text shown below with the cursor under b:
-   * This is a gap buffer[--]backspace
-   *  			     ^
-   * without the gap the text would like like
-   * This is a gap bufferbackspace
-   *                     ^
-   * After the backspace operation
-   * The buffer will be as shown below:
-   * This is a gap buffe[---]backspace
-   *                         ^                    
-   */
+ * @name Backspace
+ * This function deletes the character under the before
+ * the cursor and decrements the gapStart pointer and
+ * the cursorPos pointer.
+ * Consider the text shown below with the cursor under b:
+ * This is a gap buffer[--]backspace
+ *  			     ^
+ * without the gap the text would like like
+ * This is a gap bufferbackspace
+ *                     ^
+ * After the backspace operation
+ * The buffer will be as shown below:
+ * This is a gap buffe[---]backspace
+ *                         ^                    
+ */
 void GapBuffer::Backspace() {
   if(this->cursorPos == this->bufferStart)
     return;
@@ -119,32 +119,29 @@ void GapBuffer::MoveCursor(int pos) {
      pointer > this->bufferEnd)
     return;
   bool modifyPos = (pointer >= this->cursorPos
-		     && pointer <= this->gapEnd + 1);
+		    && pointer <= this->gapEnd + 1);
   bool MoveForward = (pointer > this->cursorPos);
 
   if(modifyPos && MoveForward) {
     pointer  = (this->gapEnd - this->cursorPos) + this->cursorPos + 1;
   }
-  //if(NeedtoMove)
-    {
-      if(MoveForward) {
-	int sizetoMove = pointer - this->gapEnd;
-	auto pointerToMove = this->gapEnd;
-	std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
-	this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
-      } else {
-	int sizetoMove = this->cursorPos - pointer;
-	auto pointerToMove = this->gapEnd - sizetoMove;
-	std::copy(pointer, pointer + (sizetoMove), pointerToMove);
-	this->cursorPos = pointer;
-      }
-      this->gapStart =this->cursorPos;
-      this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
-      // Clear the gap 
-      for(auto p = this->gapStart; p < this->gapEnd; ++p)
-	*p ='\0';
-      *(this->bufferEnd) = '\0';
-    }
+  if(MoveForward) {
+    int sizetoMove = pointer - this->gapEnd;
+    auto pointerToMove = this->gapEnd;
+    std::copy(pointerToMove, pointerToMove + sizetoMove, this->cursorPos);
+    this->cursorPos = this->cursorPos + sizetoMove; // this is not same as the pointer because of gapsize
+  } else {
+    int sizetoMove = this->cursorPos - pointer;
+    auto pointerToMove = this->gapEnd - sizetoMove;
+    std::copy(pointer, pointer + (sizetoMove), pointerToMove);
+    this->cursorPos = pointer;
+  }
+  this->gapStart =this->cursorPos;
+  this->gapEnd = this->gapStart + (this->gapSize - this->insertCounter);
+  // Clear the gap 
+  for(auto p = this->gapStart; p < this->gapEnd; ++p)
+    *p ='\0';
+  *(this->bufferEnd) = '\0';
 }
 
 /**
@@ -169,15 +166,21 @@ std::string GapBuffer::getContentOfBuffer() const{
 
 // THis is a debug print surround it with NDEBUG
 void GapBuffer::Debugprint() {
-  for(auto p = this->bufferStart; p <= this->bufferEnd; ++p) {
-
-    if(p == this->gapStart)
+  std::cout<<"\n Printing Start\n";
+  for(auto p = this->bufferStart; p < this->bufferEnd; ++p) {
+    if(p == this->gapStart) {
+      assert(*p =='\0');
       std::cout<<"\nContents of gap ==========\n";
-    if(p == this->gapEnd)
-      std::cout<<"\nGap Ended============\n";
-    if(*p == '\0' && p!=this->bufferEnd)
       std::cout<<"_";
-    std::cout<<*p;
+    }
+    else if(p == this->gapEnd) {
+      std::cout<<"\nGap Ended============\n";
+      std::cout<<*p;
+    }
+    else if(*p == '\0' )
+      std::cout<<"_";
+    else
+      std::cout<<*p;
   }
-  std::cout<<"\n";
+  std::cout<<"\nPrinting end\n";
 }

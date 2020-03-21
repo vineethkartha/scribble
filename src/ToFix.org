@@ -1,5 +1,6 @@
 * DONE After entering file name it does not get displayed immediately
 * DONE Remove the special characters.from the file.
+* LIVE Fix the unit tests in the gap buffer 
 * TODO Incremental save.
 * TODO The arrow keys should not navigate beyond text entered
 * TODO Test what happens when the boundaries are violated.

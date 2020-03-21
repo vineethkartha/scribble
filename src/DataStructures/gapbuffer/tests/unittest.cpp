@@ -4,18 +4,17 @@
 #include <string>
 #include <boost/test/included/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(InsertTest)
-{
+BOOST_AUTO_TEST_CASE(InsertTest) {
   GapBuffer gp(5);
   gp.Insert('a');
   gp.Insert('b');
   gp.Insert('c');
   gp.Insert('d');
-  BOOST_CHECK(gp.printBuffer() == "abcd");
+  BOOST_CHECK(gp.getContentOfBuffer() == "abcd");
 }
 
-BOOST_AUTO_TEST_CASE(BackSpaceTest)
-{
+
+BOOST_AUTO_TEST_CASE(BackSpaceTest) {
   GapBuffer gp(5);
   gp.Insert('a');
   gp.Insert('b');
@@ -23,90 +22,81 @@ BOOST_AUTO_TEST_CASE(BackSpaceTest)
   gp.Insert('d');
   gp.Backspace();
   gp.Backspace();
-  BOOST_CHECK(gp.printBuffer() == "ab");
-  gp.Insert('c');
-  gp.Insert('d');
-  gp.MoveGap(2);
+  BOOST_CHECK(gp.getContentOfBuffer() == "ab");
+  gp.Insert('e');
+  gp.Insert('f');
   gp.Backspace();
-  BOOST_CHECK(gp.printBuffer() == "acd");
+  BOOST_CHECK(gp.getContentOfBuffer() == "abe");
 }
 
-BOOST_AUTO_TEST_CASE(BackSpaceEdgeTest)
-{
+BOOST_AUTO_TEST_CASE(BackSpaceEdgeTest) {
   GapBuffer gp(5);
   gp.Insert('a');
   gp.Insert('b');
   gp.Insert('c');
   gp.Insert('d');
-  BOOST_CHECK(gp.printBuffer() == "abcd");
+  BOOST_CHECK(gp.getContentOfBuffer() == "abcd");
   gp.Backspace();
   gp.Backspace();
   gp.Backspace();
   gp.Backspace();
   gp.Backspace();
-  BOOST_CHECK(gp.printBuffer() == "");
+  BOOST_CHECK(gp.getContentOfBuffer() == "");
 }
 
-BOOST_AUTO_TEST_CASE(DeleteTest)
-{
+BOOST_AUTO_TEST_CASE(DeleteTest) {
   GapBuffer gp(5);
   gp.Insert('a');
   gp.Insert('b');
   gp.Insert('c');
   gp.Insert('d');
-  BOOST_CHECK(gp.printBuffer() == "abcd");
-  gp.MoveGap(1);
+  BOOST_CHECK(gp.getContentOfBuffer() == "abcd");
+  gp.MoveCursor(1);
   gp.Delete();
-  BOOST_CHECK(gp.printBuffer() == "acd");
+  BOOST_CHECK(gp.getContentOfBuffer() == "acd");
 }
-BOOST_AUTO_TEST_CASE(MoveAndInsert)
-{
+
+BOOST_AUTO_TEST_CASE(MoveAndInsert) {
   GapBuffer gapB(10);
   gapB.Insert('a');
   gapB.Insert('b');
   gapB.Insert('c');
   gapB.Insert('d');
-  gapB.Debugprint();
-  gapB.MoveGap(3);
-  gapB.Debugprint();
-  gapB.MoveGap(2);
-  gapB.Debugprint();
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abcd");
+  gapB.MoveCursor(3);
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abcd");
+  gapB.MoveCursor(2);
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abcd");
   gapB.Insert('E');
-  gapB.Debugprint();
-  std::cout<<gapB.printBuffer()<<"\n";
-  BOOST_CHECK(gapB.printBuffer() == "abEcd");
-  /*gapB.MoveGap(8);
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abEcd");
+  gapB.MoveCursor(8);
   gapB.Insert('F');
-  BOOST_CHECK(gapB.printBuffer() == "abEFcd");
-  gapB.MoveGap(9);
-  gapB.Insert('G');*/
-  //std::cout<<gapB.printBuffer();
-  //BOOST_CHECK(gapB.printBuffer() == "abEFcGd");  
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abEcFd");
+  gapB.MoveCursor(9);
+  gapB.Insert('G');
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abEcFdG");  
 }
 
-BOOST_AUTO_TEST_CASE(ResizeAndInsert)
-{
+BOOST_AUTO_TEST_CASE(ResizeAndInsert) {
   GapBuffer gapB(2);
   gapB.Insert('a');
   gapB.Insert('b');
   gapB.Insert('c');
   gapB.Insert('d');
-  gapB.MoveGap(2);
+  gapB.MoveCursor(2);
   gapB.Insert('E');
-  std::cout<<gapB.printBuffer()<<"\n";
-  BOOST_CHECK(gapB.printBuffer() == "abEcd");
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abEcd");
 }
 
-BOOST_AUTO_TEST_CASE(FillDeleteAndInsert)
-{
+BOOST_AUTO_TEST_CASE(FillDeleteAndInsert) {
   GapBuffer gapB(2);
   gapB.Insert('a');
   gapB.Insert('b');
   gapB.Insert('c');
   gapB.Insert('d');
-  gapB.MoveGap(2);
+  gapB.MoveCursor(2);
   gapB.Delete();
-  BOOST_CHECK(gapB.printBuffer() == "abd");
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abd");
   gapB.Insert('E');
-  BOOST_CHECK(gapB.printBuffer() == "abEd");
+  BOOST_CHECK(gapB.getContentOfBuffer() == "abEd");
 }

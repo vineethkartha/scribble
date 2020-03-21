@@ -29,6 +29,7 @@ GapEnd = gapStart+ (gapSize-insertCounter)
  * is the base data structure used by scribble
  * This class implements the data structure.
  */
+
 class GapBuffer:public DataStructureInterface {
   
   unsigned int gapSize;
