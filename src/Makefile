@@ -1,6 +1,6 @@
 Includes = ./includes
 CXX = g++
-CFLAGS = -std=c++11 -g
+CFLAGS = -std=c++17 -g
 OutputFileName= Scribble.out
 
 
@@ -21,3 +21,4 @@ vt100terminal.o:GUI/vt100/vt100terminal.cpp
 
 clean:
 	rm *.o *.log
+

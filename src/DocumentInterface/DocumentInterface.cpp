@@ -1,7 +1,6 @@
 #include "include/DocumentInterface.hpp"
 #include "DataStructures/include/DataStructureInterface.hpp"
 #include <iostream>
-//#include "GUI/vt100/include/vt100terminal.hpp"
 
 int DocumentInterface::fileCounter = 0;
 
@@ -14,7 +13,7 @@ DocumentInterface::DocumentInterface() {
 }
 
 DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
-  fileHandler.open(fileName, std::fstream::in | std::fstream::out | std::fstream::app);
+  fileHandler.open(fileName, std::fstream::in | std::fstream::out);
   contentBuffer = DataStructureInterface::CreateDS(1);
   char c;
   while(fileHandler.get(c)) {
@@ -26,6 +25,7 @@ DocumentInterface::DocumentInterface(std::string fName):fileName(fName) {
     }
   }
   fileNameisSet = true;
+  fileHandler.close();
 }
 
 DocumentInterface::~DocumentInterface() {
@@ -75,10 +75,14 @@ void DocumentInterface::BackSpaceBuffer() {
 void DocumentInterface::SaveBufferToFile(std::string fName) {
   if(!fileHandler.is_open()) {
     fileName = fName;
-    fileHandler.open(fName, std::fstream::in | std::fstream::out | std::fstream::app);
+    fileHandler.open(fName, std::fstream::in | std::fstream::out | std::fstream::trunc);
+    if(!fileHandler.is_open()) {
+      std::cout<<"File could not be saved \n";
+    }
     fileNameisSet = true;
   }
   fileHandler<<contentBuffer->getContentOfBuffer();
+  fileHandler.close();
   dirtyFlag = 0;
 }
 

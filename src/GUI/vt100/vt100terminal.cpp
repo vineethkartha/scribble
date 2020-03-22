@@ -235,7 +235,7 @@ std::string VT100gui::commandInputs() {
       break;
     case KEYS::CODES::BACKSPACE:
       cmdCol--;
-      buf[--i]='\0';
+      buf[i--]='\0';
       break;
     default:
       buf[i++] = ch;

@@ -1,6 +1,6 @@
 Includes = -I ./include -I ./gapbuffer/include
 CXX = g++
-CFLAGS = -std=c++11 -g
+CFLAGS = -std=c++17 -g
 
 TestFiles = ./tests/unittest.cpp
 # Libs=#whatever libraries you need to provide to g++

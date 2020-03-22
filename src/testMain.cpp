@@ -5,7 +5,6 @@
 #include <fstream>
 
 int main() {
-
   DocumentInterface *dp;
   VT100gui gui;
   int ch=0;

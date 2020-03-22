@@ -1,6 +1,6 @@
 Includes = ../
 CXX = g++
-CFLAGS = -std=c++11 -g
+CFLAGS = -std=c++17 -g
 
 # Libs=#whatever libraries you need to provide to g++
 
